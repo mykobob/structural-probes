@@ -20,18 +20,21 @@
 #
 
 # Train sections
-for i in `seq -w 2 21`; do
-        cat /u/nlp/data/PTB3/treebank_3/parsed/mrg/wsj/$i/*.mrg
+for i in `seq -f "%03g" 1 181`; do
+        cat /home/mli/nltk_data/corpora/treebank/combined/wsj_0$i.mrg
+        #cat /home/mli/School/data_mining/CS391D_Final_Project/code/lib/data/penn-treebank/ptb.train.txt
 done > ptb3-wsj-train.trees
 
 # Dev sections
-for i in 22; do
-        cat /u/nlp/data/PTB3/treebank_3/parsed/mrg/wsj/$i/*.mrg
+for i in `seq -f "%03g" 182 190`; do
+        cat /home/mli/nltk_data/corpora/treebank/combined/wsj_0$i.mrg
+        #cat /home/mli/School/data_mining/CS391D_Final_Project/code/lib/data/penn-treebank/ptb.valid.txt
 done > ptb3-wsj-dev.trees
 
 # Test sections
-for i in 23; do
-        cat /u/nlp/data/PTB3/treebank_3/parsed/mrg/wsj/$i/*.mrg
+for i in `seq -f "%03g" 191 199`; do
+        cat /home/mli/nltk_data/corpora/treebank/combined/wsj_0$i.mrg
+        #cat /home/mli/School/data_mining/CS391D_Final_Project/code/lib/data/penn-treebank/ptb.test.txt
 done > ptb3-wsj-test.trees
 
 for split in train dev test; do
