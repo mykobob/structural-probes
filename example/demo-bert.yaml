@@ -5,6 +5,7 @@ model:
   model_layer: 16 # BERT-base: {1,...,12}; ELMo: {1,2,3}
 probe:
   task_name: demo
+  task_signature: word
   maximum_rank: 1024
   psd_parameters: True
   depth_params_path: example/data/bertlarge16-depth-probe.params

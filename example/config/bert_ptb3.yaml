@@ -24,23 +24,25 @@ dataset:
     test_path: ptb3-wsj-test.bert-layers.hdf5
   batch_size: 40
 model:
-  hidden_dim: 768 # BERT hidden dim
+  hidden_dim: 1024 # BERT hidden dim
   #embedding_dim: 1024 # ELMo word embedding dim
   model_type: BERT-disk # BERT-disk, ELMo-disk, 
-  use_disk: True
+  use_disk: False
   model_layer: 11 # BERT-base: {1,...,12}; ELMo: {1,2,3}
 probe:
-  task_signature: word_pair # word, word_pair
+  task_signature: word # word, word_pair
   task_name: parse-distance
-  maximum_rank: 32
+  maximum_rank: 1024
   psd_parameters: True
   diagonal: False
-  params_path: predictor.params
+  depth_params_path: example/data/bertlarge16-depth-probe.params
+  distance_params_path: example/data/bertlarge16-distance-probe.params
+  params_path: example/data/bertlarge16-distance-probe.params
 probe_training:
   epochs: 30
   loss: L1
 reporting:
-  root: example/results
+  root: results/ 
   observation_paths:
     train_path: train.observations
     dev_path: dev.observations

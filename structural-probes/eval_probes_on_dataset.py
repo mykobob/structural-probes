@@ -29,47 +29,7 @@ import run_experiment
 from pytorch_pretrained_bert import BertTokenizer, BertModel
 
 
-def print_tikz(args, prediction_edges, words):
-    '''
-    Turns edge sets on word (nodes) into tikz dependency charts.
-
-    Args:
-    prediction_edges: A set of index pairs representing undirected dependency edges
-    words: A list of strings representing the sentence
-    '''
-    with open(os.path.join(args['reporting']['root'], 'demo.tikz'), 'a') as fout:
-        string = """\\begin{dependency}[hide label, edge unit distance=.5ex]
-        \\begin{deptext}[column sep=0.05cm]
-        """
-    string += "\\& ".join([x.replace('$', '\$').replace('&', '+') for x in words]) + " \\\\" + '\n'
-    string += "\\end{deptext}" + '\n'
-    for i_index, j_index in prediction_edges:
-        string += '\\depedge[edge style={{red!60!}}, edge below]{{{}}}{{{}}}{{{}}}\n'.format(i_index+1,j_index+1, '.')
-    string += '\\end{dependency}\n'
-    fout.write('\n\n')
-    fout.write(string)
-
-def print_distance_image(args, words, prediction, sent_index):
-    """Writes an distance matrix image to disk.
-
-    Args:
-    args: the yaml config dictionary
-    words: A list of strings representing the sentence
-    prediction: A numpy matrix of shape (len(words), len(words))
-    sent_index: An index for identifying this sentence, used
-        in the image filename.
-    """
-    plt.clf()
-    ax = sns.heatmap(prediction)
-    ax.set_title('Predicted Parse Distance (squared)')
-    ax.set_xticks(np.arange(len(words)))
-    ax.set_yticks(np.arange(len(words)))
-    ax.set_xticklabels(words, rotation=90, fontsize=6, ha='center')
-    ax.set_yticklabels(words, rotation=0, fontsize=6, va='center')
-    plt.tight_layout()
-    plt.savefig(os.path.join(args['reporting']['root'], 'demo-dist-pred'+str(sent_index)), dpi=300)
-
-def print_depth_image(args, words, prediction, sent_index):
+def get_word_depths(args, words, prediction, sent_index):
     """Writes an depth visualization image to disk.
 
     Args:
@@ -79,24 +39,25 @@ def print_depth_image(args, words, prediction, sent_index):
     sent_index: An index for identifying this sentence, used
         in the image filename.
     """
-    plt.clf()
-    fontsize = 6
-    cumdist = 0
-    for index, (word, pred) in enumerate(zip(words, prediction)):
-        plt.text(cumdist*3, pred*2, word, fontsize=fontsize, color='red', ha='center')
-    cumdist = cumdist + (np.square(len(word)) + 1)
+#     plt.clf()
+#     fontsize = 6
+#     cumdist = 0
+    return prediction * 2
+#     for index, (word, pred) in enumerate(zip(words, prediction)):
+#         plt.text(cumdist*3, pred*2, word, fontsize=fontsize, color='red', ha='center')
+#         cumdist = cumdist + (np.square(len(word)) + 1)
 
-    plt.ylim(0,20)
-    plt.xlim(0,cumdist*3.5)
-    plt.title('Predicted Parse Depth (squared)', fontsize=10)
-    plt.ylabel('Tree Depth', fontsize=10)
-    plt.xlabel('Linear Absolute Position',fontsize=10)
-    plt.tight_layout()
-    plt.xticks(fontsize=5)
-    plt.yticks(fontsize=5)
-    plt.savefig(os.path.join(args['reporting']['root'], 'demo-depth-pred'+str(sent_index)), dpi=300)
+#     plt.ylim(0,20)
+#     plt.xlim(0,cumdist*3.5)
+#     plt.title('Predicted Parse Depth (squared)', fontsize=10)
+#     plt.ylabel('Tree Depth', fontsize=10)
+#     plt.xlabel('Linear Absolute Position',fontsize=10)
+#     plt.tight_layout()
+#     plt.xticks(fontsize=5)
+#     plt.yticks(fontsize=5)
+#     plt.savefig(os.path.join(args['reporting']['root'], 'demo-depth-pred'+str(sent_index)), dpi=300)
 
-def report_on_stdin(args):
+def report_on_stdin(args, sentences):
     """Runs a trained structural probe on sentences piped to stdin.
 
     Sentences should be space-tokenized.
@@ -106,7 +67,7 @@ def report_on_stdin(args):
     args: the yaml config dictionary
     """
 
-    # Define the BERT model and tokenizer
+    # Define the BERT model and tokenizer. TODO Change this back to large for more evaluation
     tokenizer = BertTokenizer.from_pretrained('bert-large-cased')
     model = BertModel.from_pretrained('bert-large-cased')
     LAYER_COUNT = 24
@@ -122,10 +83,11 @@ def report_on_stdin(args):
     depth_probe = probe.OneWordPSDProbe(args)
     depth_probe.load_state_dict(torch.load(args['probe']['depth_params_path'], map_location=args['device']))
 
-    for index, line in tqdm(enumerate(sys.stdin), desc='[demoing]'):
+    for index, line in tqdm(enumerate(sentences), desc='[demoing]'):
         # Tokenize the sentence and create tensor inputs to BERT
         untokenized_sent = line.strip().split()
         tokenized_sent = tokenizer.wordpiece_tokenizer.tokenize('[CLS] ' + ' '.join(line.strip().split()) + ' [SEP]')
+        print('tokens', tokenized_sent)
         untok_tok_mapping = data.SubwordDataset.match_tokenized_to_untokenized(tokenized_sent, untokenized_sent)
 
         indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_sent)
@@ -140,13 +102,11 @@ def report_on_stdin(args):
 
     with torch.no_grad():
         # Run sentence tensor through BERT after averaging subwords for each token
-        print('no gradient area')
-        print('tokens & segments')
-        print(tokens_tensor.shape, segments_tensors.shape)
+        
         encoded_layers, _ = model(tokens_tensor, segments_tensors)
-        print('num layers & each layer')
-        print(len(encoded_layers), encoded_layers[0].shape)
         single_layer_features = encoded_layers[args['model']['model_layer']]
+        print(single_layer_features.shape)
+        print(untok_tok_mapping)
         representation = torch.stack([torch.mean(single_layer_features[0,untok_tok_mapping[i][0]:untok_tok_mapping[i][-1]+1,:], dim=0) for i in range(len(untokenized_sent))], dim=0)
         representation = representation.view(1, *representation.size())
 
@@ -154,14 +114,13 @@ def report_on_stdin(args):
         distance_predictions = distance_probe(representation.to(args['device'])).detach().cpu()[0][:len(untokenized_sent),:len(untokenized_sent)].numpy()
         depth_predictions = depth_probe(representation).detach().cpu()[0][:len(untokenized_sent)].numpy()
 
-        print(distance_predictions)
-        print(depth_predictions)
         # Print results visualizations
-        print_distance_image(args, untokenized_sent, distance_predictions, index)
-        print_depth_image(args, untokenized_sent, depth_predictions, index)
+        word_dists = distance_predictions
+        word_depths = get_word_depths(args, untokenized_sent, depth_predictions, index)
 
         predicted_edges = reporter.prims_matrix_to_edges(distance_predictions, untokenized_sent, untokenized_sent)
-#         print_tikz(args, predicted_edges, untokenized_sent)
+        #       print_tikz(args, predicted_edges, untokenized_sent)
+    return word_dists, word_depths, predicted_edges
 
 
 if __name__ == '__main__':
@@ -182,8 +141,4 @@ if __name__ == '__main__':
     run_experiment.setup_new_experiment_dir(cli_args, yaml_args, cli_args.results_dir)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     yaml_args['device'] = device
-
-    from pprint import pprint
-#     print()
-#     pprint(yaml_args)
     report_on_stdin(yaml_args)
