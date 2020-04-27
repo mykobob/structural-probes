@@ -83,11 +83,13 @@ def report_on_stdin(args, sentences):
     depth_probe = probe.OneWordPSDProbe(args)
     depth_probe.load_state_dict(torch.load(args['probe']['depth_params_path'], map_location=args['device']))
 
+    all_word_dists = []
+    all_word_depths = []
+    all_predicted_edges = []
     for index, line in tqdm(enumerate(sentences), desc='[demoing]'):
         # Tokenize the sentence and create tensor inputs to BERT
         untokenized_sent = line.strip().split()
         tokenized_sent = tokenizer.wordpiece_tokenizer.tokenize('[CLS] ' + ' '.join(line.strip().split()) + ' [SEP]')
-        print('tokens', tokenized_sent)
         untok_tok_mapping = data.SubwordDataset.match_tokenized_to_untokenized(tokenized_sent, untokenized_sent)
 
         indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_sent)
@@ -100,27 +102,32 @@ def report_on_stdin(args, sentences):
         segments_tensors = segments_tensors.to(args['device'])
 
 
-    with torch.no_grad():
-        # Run sentence tensor through BERT after averaging subwords for each token
-        
-        encoded_layers, _ = model(tokens_tensor, segments_tensors)
-        single_layer_features = encoded_layers[args['model']['model_layer']]
-        print(single_layer_features.shape)
-        print(untok_tok_mapping)
-        representation = torch.stack([torch.mean(single_layer_features[0,untok_tok_mapping[i][0]:untok_tok_mapping[i][-1]+1,:], dim=0) for i in range(len(untokenized_sent))], dim=0)
-        representation = representation.view(1, *representation.size())
+        with torch.no_grad():
+            # Run sentence tensor through BERT after averaging subwords for each token
 
-        # Run BERT token vectors through the trained probes
-        distance_predictions = distance_probe(representation.to(args['device'])).detach().cpu()[0][:len(untokenized_sent),:len(untokenized_sent)].numpy()
-        depth_predictions = depth_probe(representation).detach().cpu()[0][:len(untokenized_sent)].numpy()
+            encoded_layers, _ = model(tokens_tensor, segments_tensors)
+            single_layer_features = encoded_layers[args['model']['model_layer']]
+#             print(single_layer_features.shape)
+#             print(untok_tok_mapping)
+            representation = torch.stack([torch.mean(single_layer_features[0,untok_tok_mapping[i][0]:untok_tok_mapping[i][-1]+1,:], dim=0) for i in range(len(untokenized_sent))], dim=0)
+            representation = representation.view(1, *representation.size())
 
-        # Print results visualizations
-        word_dists = distance_predictions
-        word_depths = get_word_depths(args, untokenized_sent, depth_predictions, index)
+            # Run BERT token vectors through the trained probes
+            distance_predictions = distance_probe(representation.to(args['device'])).detach().cpu()[0][:len(untokenized_sent),:len(untokenized_sent)].numpy()
+            depth_predictions = depth_probe(representation).detach().cpu()[0][:len(untokenized_sent)].numpy()
 
-        predicted_edges = reporter.prims_matrix_to_edges(distance_predictions, untokenized_sent, untokenized_sent)
-        #       print_tikz(args, predicted_edges, untokenized_sent)
-    return word_dists, word_depths, predicted_edges
+            # Print results visualizations
+            word_dists = distance_predictions
+            word_depths = get_word_depths(args, untokenized_sent, depth_predictions, index)
+
+            predicted_edges = reporter.prims_matrix_to_edges(distance_predictions, untokenized_sent, untokenized_sent)
+            print('prediction edges', len(predicted_edges))
+            #       print_tikz(args, predicted_edges, untokenized_sent)
+            all_word_dists.append(word_dists)
+            all_word_depths.append(word_depths)
+            all_predicted_edges.append(predicted_edges)
+            
+    return all_word_dists, all_word_depths, all_predicted_edges
 
 
 if __name__ == '__main__':

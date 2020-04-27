@@ -30,7 +30,7 @@ model:
   use_disk: False
   model_layer: 11 # BERT-base: {1,...,12}; ELMo: {1,2,3}
 probe:
-  task_signature: word # word, word_pair
+  task_signature: word_pair# word, word_pair
   task_name: parse-distance
   maximum_rank: 1024
   psd_parameters: True
