@@ -26,7 +26,7 @@ import task
 import loss
 import run_experiment
 
-from pytorch_pretrained_bert import BertTokenizer, BertModel
+from transformers import BertTokenizer, BertModel, BertConfig
 
 
 def get_word_depths(args, words, prediction, sent_index):
@@ -69,7 +69,9 @@ def report_on_stdin(args, sentences):
 
     # Define the BERT model and tokenizer. TODO Change this back to large for more evaluation
     tokenizer = BertTokenizer.from_pretrained('bert-large-cased')
-    model = BertModel.from_pretrained('bert-large-cased')
+    model_config = BertConfig.from_pretrained('bert-large-cased')
+    model_config.output_hidden_states=True
+    model = BertModel.from_pretrained('bert-large-cased', config=model_config)
     LAYER_COUNT = 24
     FEATURE_COUNT = 1024
     model.to(args['device'])
@@ -105,7 +107,7 @@ def report_on_stdin(args, sentences):
         with torch.no_grad():
             # Run sentence tensor through BERT after averaging subwords for each token
 
-            encoded_layers, _ = model(tokens_tensor, segments_tensors)
+            _, last_hidden_states, encoded_layers = model(tokens_tensor, segments_tensors)
             single_layer_features = encoded_layers[args['model']['model_layer']]
 #             print(single_layer_features.shape)
 #             print(untok_tok_mapping)
@@ -121,7 +123,7 @@ def report_on_stdin(args, sentences):
             word_depths = get_word_depths(args, untokenized_sent, depth_predictions, index)
 
             predicted_edges = reporter.prims_matrix_to_edges(distance_predictions, untokenized_sent, untokenized_sent)
-            print('prediction edges', len(predicted_edges))
+            #print('prediction edges', len(predicted_edges))
             #       print_tikz(args, predicted_edges, untokenized_sent)
             all_word_dists.append(word_dists)
             all_word_depths.append(word_depths)
