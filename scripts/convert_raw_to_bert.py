@@ -53,8 +53,6 @@ with h5py.File(args.output_path, 'w') as fout:
   
     with torch.no_grad():
         encoded_layers, _ = model(tokens_tensor, segments_tensors)
-        print(len(encoded_layers))
-        print(encoded_layers[0].shape)
     dset = fout.create_dataset(str(index), (LAYER_COUNT, len(tokenized_text), FEATURE_COUNT))
     dset[:,:,:] = np.vstack([np.array(x) for x in encoded_layers])
   

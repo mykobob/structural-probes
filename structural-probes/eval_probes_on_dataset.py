@@ -26,7 +26,7 @@ import task
 import loss
 import run_experiment
 
-from transformers import BertTokenizer, BertModel, BertConfig
+from transformers import BertTokenizer, BertModel, BertForSequenceClassification, BertConfig
 
 
 def get_word_depths(args, words, prediction, sent_index):
@@ -57,6 +57,19 @@ def get_word_depths(args, words, prediction, sent_index):
 #     plt.yticks(fontsize=5)
 #     plt.savefig(os.path.join(args['reporting']['root'], 'demo-depth-pred'+str(sent_index)), dpi=300)
 
+
+def prepare_sentence_for_bert(line, tokenizer):
+    untokenized_sent = line.strip().split()
+    tokenized_sent = tokenizer.wordpiece_tokenizer.tokenize('[CLS] ' + ' '.join(line.strip().split()) + ' [SEP]')
+    untok_tok_mapping = data.SubwordDataset.match_tokenized_to_untokenized(tokenized_sent, untokenized_sent)
+
+    indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_sent)
+    segment_ids = [1 for x in tokenized_sent]
+
+    tokens_tensor = torch.tensor([indexed_tokens])
+    segments_tensors = torch.tensor([segment_ids])
+    return (untokenized_sent, untok_tok_mapping), tokens_tensor, segments_tensors
+
 def report_on_stdin(args, sentences):
     """Runs a trained structural probe on sentences piped to stdin.
 
@@ -68,12 +81,22 @@ def report_on_stdin(args, sentences):
     """
 
     # Define the BERT model and tokenizer. TODO Change this back to large for more evaluation
-    tokenizer = BertTokenizer.from_pretrained('bert-large-cased')
-    model_config = BertConfig.from_pretrained('bert-large-cased')
-    model_config.output_hidden_states=True
-    model = BertModel.from_pretrained('bert-large-cased', config=model_config)
-    LAYER_COUNT = 24
-    FEATURE_COUNT = 1024
+    if args['model_type'] == 'large':
+        tokenizer = BertTokenizer.from_pretrained('bert-large-cased')
+        config = BertConfig.from_pretrained('bert-large-cased')
+        config.output_hidden_states=True
+        config.num_labels = 1
+        model = BertForSequenceClassification.from_pretrained('bert-large-cased', config=config)
+        LAYER_COUNT = 24
+        FEATURE_COUNT = 1024
+    else:
+        tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
+        config = BertConfig.from_pretrained('bert-base-cased')
+        config.output_hidden_states=True
+        config.num_labels = 1
+        model = BertForSequenceClassification.from_pretrained('bert-base-cased', config=config)
+        LAYER_COUNT = 12
+        FEATURE_COUNT = 768
     model.to(args['device'])
     model.eval()
 
@@ -90,15 +113,7 @@ def report_on_stdin(args, sentences):
     all_predicted_edges = []
     for index, line in tqdm(enumerate(sentences), desc='[demoing]'):
         # Tokenize the sentence and create tensor inputs to BERT
-        untokenized_sent = line.strip().split()
-        tokenized_sent = tokenizer.wordpiece_tokenizer.tokenize('[CLS] ' + ' '.join(line.strip().split()) + ' [SEP]')
-        untok_tok_mapping = data.SubwordDataset.match_tokenized_to_untokenized(tokenized_sent, untokenized_sent)
-
-        indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_sent)
-        segment_ids = [1 for x in tokenized_sent]
-
-        tokens_tensor = torch.tensor([indexed_tokens])
-        segments_tensors = torch.tensor([segment_ids])
+        (untokenized_sent, untok_tok_mapping), tokens_tensor, segments_tensors = prepare_sentence_for_bert(line, tokenizer)
 
         tokens_tensor = tokens_tensor.to(args['device'])
         segments_tensors = segments_tensors.to(args['device'])
@@ -109,8 +124,6 @@ def report_on_stdin(args, sentences):
 
             _, last_hidden_states, encoded_layers = model(tokens_tensor, segments_tensors)
             single_layer_features = encoded_layers[args['model']['model_layer']]
-#             print(single_layer_features.shape)
-#             print(untok_tok_mapping)
             representation = torch.stack([torch.mean(single_layer_features[0,untok_tok_mapping[i][0]:untok_tok_mapping[i][-1]+1,:], dim=0) for i in range(len(untokenized_sent))], dim=0)
             representation = representation.view(1, *representation.size())
 
@@ -125,11 +138,12 @@ def report_on_stdin(args, sentences):
             predicted_edges = reporter.prims_matrix_to_edges(distance_predictions, untokenized_sent, untokenized_sent)
             #print('prediction edges', len(predicted_edges))
             #       print_tikz(args, predicted_edges, untokenized_sent)
+
             all_word_dists.append(word_dists)
             all_word_depths.append(word_depths)
             all_predicted_edges.append(predicted_edges)
             
-    return all_word_dists, all_word_depths, all_predicted_edges
+    return all_word_dists, all_word_depths, all_predicted_edges, model, tokenizer
 
 
 if __name__ == '__main__':

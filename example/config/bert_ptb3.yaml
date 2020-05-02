@@ -19,16 +19,15 @@ dataset:
   embeddings:
     type: token #{token,subword}
     root: my_tests/
-    train_path: ptb3-wsj-train.bert-layers.hdf5
-    dev_path: ptb3-wsj-dev.bert-layers.hdf5
-    test_path: ptb3-wsj-test.bert-layers.hdf5
+    train_path: ptb3-wsj-train.bert-large-layers.hdf5
+    dev_path: ptb3-wsj-dev.bert-large-layers.hdf5
+    test_path: ptb3-wsj-test.bert-large-layers.hdf5
   batch_size: 40
 model:
   hidden_dim: 1024 # BERT hidden dim
-  #embedding_dim: 1024 # ELMo word embedding dim
   model_type: BERT-disk # BERT-disk, ELMo-disk, 
   use_disk: False
-  model_layer: 11 # BERT-base: {1,...,12}; ELMo: {1,2,3}
+  model_layer: 2 # BERT-base: {0,...,11}; BERT-large: {0, 23}
 probe:
   task_signature: word_pair# word, word_pair
   task_name: parse-distance
@@ -37,7 +36,7 @@ probe:
   diagonal: False
   depth_params_path: example/data/bertlarge16-depth-probe.params
   distance_params_path: example/data/bertlarge16-distance-probe.params
-  params_path: example/data/bertlarge16-distance-probe.params
+  params_path: example/data/bertlarge16-depth-probe.params
 probe_training:
   epochs: 30
   loss: L1
