@@ -121,7 +121,8 @@ def report_on_stdin(args, sentences):
 
         with torch.no_grad():
             # Run sentence tensor through BERT after averaging subwords for each token
-            logits, encoded_layers = model(tokens_tensor, segments_tensors)
+
+            _, last_hidden_states, encoded_layers = model(tokens_tensor, segments_tensors)
             single_layer_features = encoded_layers[args['model']['model_layer']]
             representation = torch.stack([torch.mean(single_layer_features[0,untok_tok_mapping[i][0]:untok_tok_mapping[i][-1]+1,:], dim=0) for i in range(len(untokenized_sent))], dim=0)
             representation = representation.view(1, *representation.size())
@@ -135,6 +136,8 @@ def report_on_stdin(args, sentences):
             word_depths = get_word_depths(args, untokenized_sent, depth_predictions, index)
 
             predicted_edges = reporter.prims_matrix_to_edges(distance_predictions, untokenized_sent, untokenized_sent)
+            #print('prediction edges', len(predicted_edges))
+            #       print_tikz(args, predicted_edges, untokenized_sent)
 
             all_word_dists.append(word_dists)
             all_word_depths.append(word_depths)
