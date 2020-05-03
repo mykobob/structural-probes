@@ -15,18 +15,21 @@ from loaders import SST
 
 
 def determine_correctness(pred, label):
-    """Takes in pred and label (both tensors) and returns average correctness (float) and percentage of Ones (tensor)"""
+    """Takes in pred and label (both tensors) and returns average correctness (float)"""
     correct = 0.0
-    guessed_one = 0.0
 
-    sig_pred = F.sigmoid(pred)
-    # tensor of 0s and 1s
-    bool_pred = (sig_pred > 0.5).float()
-    avg_correct = (bool_pred == label).float().mean()
+    with torch.no_grad():
+        sig_pred = F.sigmoid(pred)
+        # tensor of 0s and 1s
 
-    guessed_one = torch.sum(bool_pred)
+        guesses = sig_pred * 5
+        labels = label * 5
 
-    return avg_correct, guessed_one
+        preds = torch.floor(guesses)
+        labels = torch.floor(labels)
+        avg_correct = (preds == labels).float().mean()
+    
+        return avg_correct
 
 
 class SST_Test(pl.LightningModule):
@@ -47,7 +50,6 @@ class SST_Test(pl.LightningModule):
         #self.bert_layers_dict = self._load_bert_dict()
         self.bert = self.create_model(args.device)
 
-        self.pos_weight = torch.Tensor([.5]).to(args.device)
         self.training_acc = []
 
     def create_model(self, device):
@@ -85,20 +87,21 @@ class SST_Test(pl.LightningModule):
 
         pred = self.forward(sent_tensor, attn_mask)
 
-        correct, _ = determine_correctness(pred, label)
+        correct = determine_correctness(pred, label)
         self.training_acc.append(correct.clone().detach().float())
 
-        loss = F.binary_cross_entropy_with_logits(pred, label)  # , pos_weight=self.pos_weight)
+        log_loss = F.binary_cross_entropy_with_logits(pred, label)  # , pos_weight=self.pos_weight)
+        loss = torch.exp(log_loss)
 
         try:
             # If there is a scheduler set up, log the learning rate, otherwise skip it.
-            tensorboard_logs = {'train_loss': loss, 'lr': torch.tensor(self.sched.get_lr()).squeeze()}
+            tensorboard_logs = {'train_log_loss': log_loss, 'lr': torch.tensor(self.sched.get_lr()).squeeze(), 'train_loss': loss}
         except AttributeError:
-            tensorboard_logs = {'train_loss': loss}
+            tensorboard_logs = {'train_log_loss': log_loss, 'train_loss': loss}
 
         self.logger.log_metrics(tensorboard_logs, step=self.global_step)
 
-        return {'loss': loss, 'log': tensorboard_logs}
+        return {'log_loss': log_loss, 'loss': loss, 'log': tensorboard_logs}
 
     def on_epoch_end(self):
         training_acc_tensor = torch.stack(self.training_acc)
@@ -117,10 +120,10 @@ class SST_Test(pl.LightningModule):
         pred = self.forward(sent_tensor, attn_mask)
 
         loss = F.binary_cross_entropy_with_logits(pred, label)
-        correct, guessed_one = determine_correctness(pred, label)
+        correct = determine_correctness(pred, label)
 
         return {'val_loss': loss, 'correct': torch.tensor(correct).clone().detach(),
-                'guessed_one': torch.tensor(guessed_one), 'predicted': pred.detach()}
+                'predicted': pred.detach()}
 
     def validation_epoch_end(self, outputs):
         # Check if a layer should be unfrozen this epoch
@@ -131,12 +134,11 @@ class SST_Test(pl.LightningModule):
         # Combine validation results
         avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
         accuracy = torch.stack([x['correct'] for x in outputs]).mean() * 100.0
-        pct_ones = torch.stack([x['guessed_one'] for x in outputs]).mean() * 100.0
 
         predictions = torch.stack([x['predicted'] for x in outputs])
 
         tensorboard_logs = {
-            'val_loss': avg_loss, 'val_acc': accuracy, 'pct_ones': pct_ones,
+            'val_loss': avg_loss, 'val_acc': accuracy, 
             'mean_pred': predictions.mean(), 'std_pred': predictions.std()
         }
 
