@@ -16,20 +16,18 @@ from loaders import SST
 
 def determine_correctness(pred, label):
     """Takes in pred and label (both tensors) and returns average correctness (float)"""
-    correct = 0.0
-
     with torch.no_grad():
         sig_pred = F.sigmoid(pred)
+        return torch.mean((label - sig_pred) ** 2)
         # tensor of 0s and 1s
 
-        guesses = sig_pred * 5
-        labels = label * 5
+        #guesses = sig_pred * 5
+        #labels = label * 5
 
-        preds = torch.floor(guesses)
-        labels = torch.floor(labels)
-        avg_correct = (preds == labels).float().mean()
-    
-        return avg_correct
+        #preds = torch.floor(guesses)
+        #labels = torch.floor(labels)
+        #avg_correct = (preds == labels).float().mean()
+        #return avg_correct
 
 
 class SST_Test(pl.LightningModule):
@@ -67,7 +65,7 @@ class SST_Test(pl.LightningModule):
     def freeze_bert(self, bert):
         # Freeze layers of bert
         for name, param in bert.named_parameters():
-            if not "embedding" in name and not "classifier" in name:
+            if not "classifier" in name:
                 param.requires_grad = False
             else:
                 print(f"{name} is unfrozen")
@@ -77,7 +75,8 @@ class SST_Test(pl.LightningModule):
     def forward(self, x, attn_mask):
         bert_out = self.bert(x, attention_mask=attn_mask)
 
-        output = bert_out[0].squeeze(1)
+        #output = bert_out[0].squeeze(1)
+        output = bert_out[0]
         return output
 
     def training_step(self, batch, batch_nb):
@@ -85,44 +84,44 @@ class SST_Test(pl.LightningModule):
         attn_mask = batch['attn_mask']
         label = batch['label']
 
+        print('training', sent_tensor.shape)
         pred = self.forward(sent_tensor, attn_mask)
 
         correct = determine_correctness(pred, label)
         self.training_acc.append(correct.clone().detach().float())
 
-        log_loss = F.binary_cross_entropy_with_logits(pred, label)  # , pos_weight=self.pos_weight)
-        loss = torch.exp(log_loss)
+        loss = F.mse_loss(pred, label, reduction='mean')  # , pos_weight=self.pos_weight)
+        #loss = torch.exp(log_loss)
 
         try:
             # If there is a scheduler set up, log the learning rate, otherwise skip it.
-            tensorboard_logs = {'train_log_loss': log_loss, 'lr': torch.tensor(self.sched.get_lr()).squeeze(), 'train_loss': loss}
+            tensorboard_logs = {'train_loss': loss, 'lr': torch.tensor(self.sched.get_lr()).squeeze()}
         except AttributeError:
-            tensorboard_logs = {'train_log_loss': log_loss, 'train_loss': loss}
+            tensorboard_logs = {'train_loss': loss}
 
         self.logger.log_metrics(tensorboard_logs, step=self.global_step)
 
-        return {'log_loss': log_loss, 'loss': loss, 'log': tensorboard_logs}
+        return {'loss': loss, 'log': tensorboard_logs}
 
     def on_epoch_end(self):
         training_acc_tensor = torch.stack(self.training_acc)
-        avg_training_acc = {"avg_train_acc": training_acc_tensor.mean()}
-        self.logger.log_metrics(avg_training_acc, step=self.global_step)
+        avg_mse = {"mse": training_acc_tensor.mean()}
+        self.logger.log_metrics(avg_mse, step=self.global_step)
 
         # clear training_acc
         self.training_acc = []
 
     def validation_step(self, batch, batch_nb):
-        
         sent_tensor = batch['sentence_tensor']
         attn_mask = batch['attn_mask']
         label = batch['label']
 
+        print('validation', sent_tensor.shape, attn_mask.shape)
         pred = self.forward(sent_tensor, attn_mask)
 
-        loss = F.binary_cross_entropy_with_logits(pred, label)
-        correct = determine_correctness(pred, label)
+        loss = F.mse_loss(pred, label, reduction='mean')
 
-        return {'val_loss': loss, 'correct': torch.tensor(correct).clone().detach(),
+        return {'val_loss': loss.clone().detach(),
                 'predicted': pred.detach()}
 
     def validation_epoch_end(self, outputs):
@@ -133,12 +132,11 @@ class SST_Test(pl.LightningModule):
 
         # Combine validation results
         avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
-        accuracy = torch.stack([x['correct'] for x in outputs]).mean() * 100.0
 
         predictions = torch.stack([x['predicted'] for x in outputs])
 
         tensorboard_logs = {
-            'val_loss': avg_loss, 'val_acc': accuracy, 
+            'val_loss': avg_loss,
             'mean_pred': predictions.mean(), 'std_pred': predictions.std()
         }
 
@@ -146,8 +144,8 @@ class SST_Test(pl.LightningModule):
             # We don't want the "sanity check" validation run to be logged
             self.logger.log_metrics(tensorboard_logs, step=self.global_step)
 
-        print("Val loss: {:.3f}, Val acc: {:.3f}".format(avg_loss, accuracy))
-        return {'val_loss': avg_loss, 'val_acc': accuracy, 'log': tensorboard_logs}
+        print("Val loss: {:.3f}".format(avg_loss))
+        return {'val_loss': avg_loss, 'log': tensorboard_logs}
 
     def test_step(self, batch, batch_nb):
         # If we're running against the original test set, just forward batch to validation_step
@@ -165,22 +163,16 @@ class SST_Test(pl.LightningModule):
         # When running against the standard test set, extract loss and accuracy as normal
         if not self.adversarial_test_flag:
             test_loss = end_dict['val_loss']
-            test_acc = end_dict['val_acc']
             end_dict['test_loss'] = test_loss
-            end_dict['test_acc'] = test_acc
-            print(f"Test loss: {test_loss}\nTest Accuracy:{test_acc}")
+            print(f"Test loss: {test_loss}\n")
             del end_dict['val_loss']
-            del end_dict['val_acc']
             return end_dict
         else:
             # If we're already on the adversarial set, extract loss and accuracy but name them adversarial
             test_loss = end_dict['val_loss']
-            test_acc = end_dict['val_acc']
             end_dict['adverse_test_loss'] = test_loss
-            end_dict['adverse_test_acc'] = test_acc
-            print(f"Adversarial Test loss: {test_loss}\nAdversarial Test Accuracy:{test_acc}")
+            print(f"Adversarial Test loss: {test_loss}\n")
             del end_dict['val_loss']
-            del end_dict['val_acc']
             return end_dict
 
     def configure_optimizers(self):
@@ -203,7 +195,7 @@ class SST_Test(pl.LightningModule):
     @pl.data_loader
     def val_dataloader(self):
         self.log.info(f"Validation dataset has {len(self.val_dataset)} examples")
-        return DataLoader(self.val_dataset, 1, shuffle=False)
+        return DataLoader(self.val_dataset, 2, shuffle=False)
     
     ############################
     ## BERT Unfreezing Logic

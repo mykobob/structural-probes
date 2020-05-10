@@ -39,28 +39,13 @@ def get_word_depths(args, words, prediction, sent_index):
     sent_index: An index for identifying this sentence, used
         in the image filename.
     """
-#     plt.clf()
-#     fontsize = 6
-#     cumdist = 0
     return prediction * 2
-#     for index, (word, pred) in enumerate(zip(words, prediction)):
-#         plt.text(cumdist*3, pred*2, word, fontsize=fontsize, color='red', ha='center')
-#         cumdist = cumdist + (np.square(len(word)) + 1)
-
-#     plt.ylim(0,20)
-#     plt.xlim(0,cumdist*3.5)
-#     plt.title('Predicted Parse Depth (squared)', fontsize=10)
-#     plt.ylabel('Tree Depth', fontsize=10)
-#     plt.xlabel('Linear Absolute Position',fontsize=10)
-#     plt.tight_layout()
-#     plt.xticks(fontsize=5)
-#     plt.yticks(fontsize=5)
-#     plt.savefig(os.path.join(args['reporting']['root'], 'demo-depth-pred'+str(sent_index)), dpi=300)
 
 
 def prepare_sentence_for_bert(line, tokenizer):
+    print(line)
     untokenized_sent = line.strip().split()
-    tokenized_sent = tokenizer.wordpiece_tokenizer.tokenize('[CLS] ' + ' '.join(line.strip().split()) + ' [SEP]')
+    tokenized_sent = tokenizer.wordpiece_tokenizer.tokenize('[CLS] ' + ' '.join(untokenized_sent) + ' [SEP]')
     untok_tok_mapping = data.SubwordDataset.match_tokenized_to_untokenized(tokenized_sent, untokenized_sent)
 
     indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_sent)
@@ -86,7 +71,8 @@ def report_on_stdin(args, sentences):
         config = BertConfig.from_pretrained('bert-large-cased')
         config.output_hidden_states=True
         config.num_labels = 1
-        model = BertForSequenceClassification.from_pretrained('bert-large-cased', config=config)
+        #model = BertForSequenceClassification.from_pretrained('bert-large-cased', config=config)
+        model = BertForSequenceClassification.from_pretrained('best_model', config=config)
         LAYER_COUNT = 24
         FEATURE_COUNT = 1024
     else:
@@ -94,7 +80,8 @@ def report_on_stdin(args, sentences):
         config = BertConfig.from_pretrained('bert-base-cased')
         config.output_hidden_states=True
         config.num_labels = 1
-        model = BertForSequenceClassification.from_pretrained('bert-base-cased', config=config)
+        #model = BertForSequenceClassification.from_pretrained('bert-base-cased', config=config)
+        model = BertForSequenceClassification.from_pretrained('best_model', config=config)
         LAYER_COUNT = 12
         FEATURE_COUNT = 768
     model.to(args['device'])
@@ -122,7 +109,7 @@ def report_on_stdin(args, sentences):
         with torch.no_grad():
             # Run sentence tensor through BERT after averaging subwords for each token
 
-            _, last_hidden_states, encoded_layers = model(tokens_tensor, segments_tensors)
+            last_hidden_states, encoded_layers = model(tokens_tensor, segments_tensors)
             single_layer_features = encoded_layers[args['model']['model_layer']]
             representation = torch.stack([torch.mean(single_layer_features[0,untok_tok_mapping[i][0]:untok_tok_mapping[i][-1]+1,:], dim=0) for i in range(len(untokenized_sent))], dim=0)
             representation = representation.view(1, *representation.size())

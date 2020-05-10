@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../structural-probes/')
 import torch
 import numpy as np
 from pytorch_lightning import Trainer
