@@ -25,7 +25,13 @@ class SST(Dataset):
         sentence = row["sentence"]
         sentiment = row["sentiment"]
 
-        _, tokenized_tensor, segments_tensors = prepare_sentence_for_bert(sentence, self.tokenizer)
+        _, tokenized_tensor, segments_tensors = prepare_sentence_for_bert(sentence, self.tokenizer, max_seq_len=self.max_seq_len)
+        data = {
+            'sentence_tensor': tokenized_tensor,
+            'attn_mask': segments_tensors,
+            'label': torch.tensor([sentiment]).float()
+        }
+
         # Need to do tokenization here so that it can be run in batches
         #tokenized_sent = self.tokenizer.tokenize(sentence)
 
@@ -47,11 +53,6 @@ class SST(Dataset):
         #data = {'sentence_tensor': sent_tensor, 
         #        'attn_mask': attn_mask_tensor,
         #        'label': torch.tensor(sentiment).float().to(self.device)}
-        data = {
-                'sentence_tensor': tokenized_tensor,
-                'attn_mask': segments_tensors,
-                'label': torch.tensor(sentiment).float().to(self.device)
-                }
         return data
 
 

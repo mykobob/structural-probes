@@ -13,7 +13,7 @@ import os
 import random
 
 if __name__ == "__main__":
-    args = parse_args()
+    hparams, args = parse_args()
     # Set device to cuda if available unless explicitly disabled
     if args.device == torch.device('cuda'):
         num_gpus = 1
@@ -42,7 +42,7 @@ if __name__ == "__main__":
         experiment_name = args.run_name
     )
     # Log args to comet
-    comet_logger.log_hyperparams(args)
+    comet_logger.log_hyperparams(hparams)
     comet_logger.experiment.set_name(args.run_name)
     comet_logger.experiment.add_tag("sst-tests")
 
@@ -54,19 +54,18 @@ if __name__ == "__main__":
         filepath= os.path.join("lightning_logs", args.run_name, "checkpoints"),
         save_top_k=args.num_saved_models,
         verbose=True,
-        monitor="val_acc",
-        mode="max",
+        monitor="val_loss",
+        mode="min",
     )
 
     if args.early_stopping:
         early_stopping = EarlyStopping(
-            #monitor='val_loss',
-            monitor='val_acc',
+            monitor='val_loss',
             min_delta=0.00,
             patience=args.early_stopping,
             verbose=False,
-            #mode='min'
-            mode='max'
+            mode='min'
+            #mode='max'
         )
     else:
         early_stopping = None
@@ -75,7 +74,14 @@ if __name__ == "__main__":
     # Model creation
     ###############
 
-    model = SST_Test(args).to(args.device)
+    testing = False
+    if testing:
+        model = SST_Test.load_from_metrics(
+                weights_path='lightning_logs/regression_training/_ckpt_epoch_19',
+                map_location=None)
+    else:
+        model = SST_Test(args, hparams).to(args.device)
+
     comet_logger.experiment.add_tag("SST")
     
 
@@ -94,4 +100,10 @@ if __name__ == "__main__":
         logger=comet_logger,
     )
     
-    trainer.fit(model)
+    if testing:
+        trainer.test(model)
+    else:
+        trainer.fit(model)
+    
+    model.bert.save_pretrained('../best_model')
+    

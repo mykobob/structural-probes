@@ -42,20 +42,21 @@ def get_word_depths(args, words, prediction, sent_index):
     return prediction * 2
 
 
-def prepare_sentence_for_bert(line, tokenizer):
-    print(line)
+def prepare_sentence_for_bert(line, tokenizer, max_seq_len=64):
     untokenized_sent = line.strip().split()
     tokenized_sent = tokenizer.wordpiece_tokenizer.tokenize('[CLS] ' + ' '.join(untokenized_sent) + ' [SEP]')
+    tokenized_sent = tokenized_sent + ['[PAD]'] * (max_seq_len - len(tokenized_sent))
     untok_tok_mapping = data.SubwordDataset.match_tokenized_to_untokenized(tokenized_sent, untokenized_sent)
 
     indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_sent)
     segment_ids = [1 for x in tokenized_sent]
 
-    tokens_tensor = torch.tensor([indexed_tokens])
-    segments_tensors = torch.tensor([segment_ids])
+    tokens_tensor = torch.tensor(indexed_tokens)
+    segments_tensors = torch.tensor(segment_ids)
     return (untokenized_sent, untok_tok_mapping), tokens_tensor, segments_tensors
 
-def report_on_stdin(args, sentences):
+
+def use_probes(args, sentences, model, tokenizer):
     """Runs a trained structural probe on sentences piped to stdin.
 
     Sentences should be space-tokenized.
@@ -64,28 +65,6 @@ def report_on_stdin(args, sentences):
     Args:
     args: the yaml config dictionary
     """
-
-    # Define the BERT model and tokenizer. TODO Change this back to large for more evaluation
-    if args['model_type'] == 'large':
-        tokenizer = BertTokenizer.from_pretrained('bert-large-cased')
-        config = BertConfig.from_pretrained('bert-large-cased')
-        config.output_hidden_states=True
-        config.num_labels = 1
-        #model = BertForSequenceClassification.from_pretrained('bert-large-cased', config=config)
-        model = BertForSequenceClassification.from_pretrained('best_model', config=config)
-        LAYER_COUNT = 24
-        FEATURE_COUNT = 1024
-    else:
-        tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
-        config = BertConfig.from_pretrained('bert-base-cased')
-        config.output_hidden_states=True
-        config.num_labels = 1
-        #model = BertForSequenceClassification.from_pretrained('bert-base-cased', config=config)
-        model = BertForSequenceClassification.from_pretrained('best_model', config=config)
-        LAYER_COUNT = 12
-        FEATURE_COUNT = 768
-    model.to(args['device'])
-    model.eval()
 
     # Define the distance probe
     distance_probe = probe.TwoWordPSDProbe(args)
@@ -102,8 +81,8 @@ def report_on_stdin(args, sentences):
         # Tokenize the sentence and create tensor inputs to BERT
         (untokenized_sent, untok_tok_mapping), tokens_tensor, segments_tensors = prepare_sentence_for_bert(line, tokenizer)
 
-        tokens_tensor = tokens_tensor.to(args['device'])
-        segments_tensors = segments_tensors.to(args['device'])
+        tokens_tensor = tokens_tensor.unsqueeze(0).to(args['device'])
+        segments_tensors = segments_tensors.unsqueeze(0).to(args['device'])
 
 
         with torch.no_grad():
@@ -130,7 +109,7 @@ def report_on_stdin(args, sentences):
             all_word_depths.append(word_depths)
             all_predicted_edges.append(predicted_edges)
             
-    return all_word_dists, all_word_depths, all_predicted_edges, model, tokenizer
+    return all_word_dists, all_word_depths, all_predicted_edges
 
 
 if __name__ == '__main__':

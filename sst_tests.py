@@ -14,6 +14,7 @@ import torch
 import pandas as pd
 import eval_probes_on_dataset
 import jupyter_slack
+from transformers import BertConfig, BertTokenizer, BertForSequenceClassification
 
 
 # In[2]:
@@ -127,7 +128,26 @@ gt_dev_trees = read_trees(gt_tree_dev_path)
 # import importlib
 # importlib.reload(eval_probes_on_dataset)
 
-word_dists, word_depths, predicted_edges, model, tokenizer = eval_probes_on_dataset.report_on_stdin(yaml_args, dev_sentiment)
+if yaml_args['model_type'] == 'large':
+    tokenizer = BertTokenizer.from_pretrained('bert-large-cased')
+    config = BertConfig.from_pretrained('bert-large-cased')
+    config.output_hidden_states=True
+    config.num_labels = 1
+    model = BertForSequenceClassification.from_pretrained('finetuning/lightning_logs/regression_testing', config=config)
+    LAYER_COUNT = 24
+    FEATURE_COUNT = 1024
+else:
+    tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
+    config = BertConfig.from_pretrained('bert-base-cased')
+    config.output_hidden_states=True
+    config.num_labels = 1
+    model = BertForSequenceClassification.from_pretrained('finetuning/lightning_logs/regression_testing', config=config)
+    LAYER_COUNT = 12
+    FEATURE_COUNT = 768
+model.to(args['device'])
+model.eval()
+
+word_dists, word_depths, predicted_edges, tokenizer = eval_probes_on_dataset.report_on_stdin(yaml_args, dev_sentiment)
 
 
 # In[7]:
@@ -138,11 +158,12 @@ for line in tqdm(dev_sentiment, desc='Eval Dev Sentiment'):
     _, tokens_tensor, segments_tensors = eval_probes_on_dataset.prepare_sentence_for_bert(line, tokenizer)
 
     device = yaml_args['device']
-    tokens_tensor = tokens_tensor.to(device)
-    segments_tensors = segments_tensors.to(device)
+    tokens_tensor = tokens_tensor.unsqueeze(0).to(device)
+    segments_tensors = segments_tensors.unsqueeze(0).to(device)
     with torch.no_grad():
         logits, encoded_layers = model(tokens_tensor, segments_tensors)
         probs = sigmoid(logits)
+        print(probs)
 
 
 # In[8]:

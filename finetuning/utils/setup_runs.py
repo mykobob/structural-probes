@@ -3,6 +3,9 @@ import os
 
 import torch
 
+from argparse import Namespace
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
 
@@ -21,26 +24,19 @@ def parse_args():
     #############################
     ## Dataset arguments
     #############################
-    parser.add_argument("--sst_train_path", default=os.path.join("..", "..", "..", "..", "data", "SST-2", "sentence_splits", "train.tsv"), type=str, help="Path to sst-train.tsv for sst dataset")
-    parser.add_argument("--sst_val_path", default=os.path.join("..", "..", "..", "..", "data", "SST-2", "sentence_splits", "dev.tsv"), type=str, help="Path to sst-dev.tsv for sst dataset")
-
-    #############################
-    ## Unfreezing arguments
-    #############################
-    parser.add_argument("--unfreeze_offset", default=5, type=int, help="Number of epochs to wait before unfreezing first layer")
-    parser.add_argument("--unfreeze_interval", default=5, type=int, help="Number of epochs between each layer unfreezing")
+    parser.add_argument("--sst_train_path", default=os.path.join("..", "..", "..", "..", "data", "SST-2", "sentence_splits", "train_cat.tsv"), type=str, help="Path to sst-train.tsv for sst dataset")
+    parser.add_argument("--sst_val_path", default=os.path.join("..", "..", "..", "..", "data", "SST-2", "sentence_splits", "dev_cat.tsv"), type=str, help="Path to sst-dev.tsv for sst dataset")
 
     #############################
     ## Misc and settings
     #############################
     parser.add_argument("--disable_cuda", action="store_true", help="disable cuda for training")
-    parser.add_argument("--run_name", default="default", type=str, required=True, help="Name for this particular run. Used to write .txt file displaying arguments and results, and .pth file for model checkpoint")
+    parser.add_argument("--run_name", default="default", type=str, help="Name for this particular run. Used to write .txt file displaying arguments and results, and .pth file for model checkpoint")
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--log_level", default="info", choices=["debug", "info", "warn"])
     parser.add_argument("--num_saved_models", default=1, type=int, help="The number of models to checkpoint for this run")
     parser.add_argument("--early_stopping", default=None, type=int, help="The number of epochs to wait before early stopping")
 
-    parser.add_argument("--no_tuning", action='store_true', help="Run the baseline of frozen BERT with no tuning")
 
     args = parser.parse_args()
     # Set device to cuda if available unless explicitly disabled
@@ -53,10 +49,10 @@ def parse_args():
     if args.debug:
         args.log_level = "debug"
 
-    # This is only used in testing. Do not reset it.
-
-    # args.adversarial_test_flag = False
-    return args
+    hparam_keys = 'lr lr_factor epochs max_seq_len train_pct val_pct seed'.split()
+    hparams = {'lr': args.lr, 'lr_factor': args.lr_factor, 'epochs': args.epochs, 'max_seq_len': args.max_seq_len, 'train_pct': args.train_pct, 'val_pct': args.val_pct, 'seed': args.seed}
+    hparams = Namespace(**hparams)
+    return hparams, args
 
 
 def parse_eval_args():
