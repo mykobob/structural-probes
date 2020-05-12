@@ -6,6 +6,39 @@ import torch
 from argparse import Namespace
 
 
+def get_default_args(desired_hparams, desired_params):
+    
+    hparams = {
+        'batch_size': 4,
+        'lr': 0.0005,
+        'lr_factor': 1,
+        'epochs': 10,
+        'max_seq_len': 250,
+        'train_pct': 1.0,
+        'val_pct': 1.0,
+        'seed': 404,
+    }
+
+    params = {
+        'sst_train_path': os.path.join("..", "..", "..", "..", "data", "SST-2", "sentence_splits", "train_cat.tsv"),
+        'sst_val_path': os.path.join("..", "..", "..", "..", "data", "SST-2", "sentence_splits", "dev_cat.tsv"),
+        'disable_cuda': False,
+        'run_name': 'default',
+        'debug': False,
+        'log_level': 'info',
+        'num_saved_models': 1,
+        'early_stopping': None,
+    }
+    if torch.cuda.is_available() and not params['disable_cuda']:
+        params['device'] = torch.device('cuda')
+    else:
+        params['device'] = torch.device('cpu')
+
+    hparams = Namespace(**dict(hparams, **desired_hparams))
+    params = Namespace(**dict(params, **desired_params))
+    return hparams, params
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
 
@@ -49,8 +82,8 @@ def parse_args():
     if args.debug:
         args.log_level = "debug"
 
-    hparam_keys = 'lr lr_factor epochs max_seq_len train_pct val_pct seed'.split()
-    hparams = {'lr': args.lr, 'lr_factor': args.lr_factor, 'epochs': args.epochs, 'max_seq_len': args.max_seq_len, 'train_pct': args.train_pct, 'val_pct': args.val_pct, 'seed': args.seed}
+    hparam_keys = 'lr lr_factor epochs max_seq_len train_pct val_pct seed batch_size'.split()
+    hparams = {'lr': args.lr, 'lr_factor': args.lr_factor, 'epochs': args.epochs, 'max_seq_len': args.max_seq_len, 'train_pct': args.train_pct, 'val_pct': args.val_pct, 'seed': args.seed, 'batch_size': args.batch_size}
     hparams = Namespace(**hparams)
     return hparams, args
 

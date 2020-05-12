@@ -28,8 +28,8 @@ class SST_Test(pl.LightningModule):
         self.log = self._config_logger()
         self.hparams = hparams
 
-        self.train_dataset = SST(args, args.sst_train_path)
-        self.val_dataset =   SST(args, args.sst_val_path)
+        self.train_dataset = SST(args, hparams, args.sst_train_path)
+        self.val_dataset =   SST(args, hparams, args.sst_val_path)
 
         self.bert = self.create_model(args.device)
         self.training_acc = []
@@ -81,18 +81,19 @@ class SST_Test(pl.LightningModule):
             tensorboard_logs = {'train_loss': loss, 'lr': torch.tensor(self.sched.get_lr()).squeeze()}
         except AttributeError:
             tensorboard_logs = {'train_loss': loss}
-
-        self.logger.log_metrics(tensorboard_logs, step=self.global_step)
+#         import pdb; pdb.set_trace()
+#         self.logger.log_metrics(tensorboard_logs, step=self.global_step)
 
         return {'loss': loss, 'log': tensorboard_logs}
 
     def on_epoch_end(self):
         training_acc_tensor = torch.stack(self.training_acc)
         avg_mse = {"mse": training_acc_tensor.mean()}
-        self.logger.log_metrics(avg_mse, step=self.global_step)
+#         self.logger.log_metrics(avg_mse, step=self.global_step)
 
         # clear training_acc
         self.training_acc = []
+        return avg_mse
 
     def validation_step(self, batch, batch_nb):
         sent_tensor = batch['sentence_tensor']
@@ -117,9 +118,9 @@ class SST_Test(pl.LightningModule):
             'mean_pred': predictions.mean(), 'std_pred': predictions.std()
         }
 
-        if self.current_epoch != 0:
+#         if self.current_epoch != 0:
             # We don't want the "sanity check" validation run to be logged
-            self.logger.log_metrics(tensorboard_logs, step=self.global_step)
+#             self.logger.log_metrics(tensorboard_logs, step=self.global_step)
 
         print("Val loss: {:.3f}".format(avg_loss))
         return {'val_loss': avg_loss, 'log': tensorboard_logs}
@@ -137,7 +138,7 @@ class SST_Test(pl.LightningModule):
         return end_dict
 
     def configure_optimizers(self):
-        optim = torch.optim.Adam(self.parameters(), lr=self.args.lr)
+        optim = torch.optim.Adam(self.parameters(), lr=self.hparams.lr)
         # optim = torch.optim.SGD(self.parameters(), lr=self.args.lr, momentum=0.9)
         #milestones = [self.args.unfreeze_offset + (x * self.args.unfreeze_interval) for x in range(self.args.epochs)]
         self.sched = torch.optim.lr_scheduler.ReduceLROnPlateau(optim)#, gamma=self.args.lr_factor, milestones=milestones)
@@ -152,7 +153,7 @@ class SST_Test(pl.LightningModule):
     @pl.data_loader
     def train_dataloader(self):
         self.log.info(f"Training dataset has {len(self.train_dataset)} examples")
-        return DataLoader(self.train_dataset, self.args.batch_size, shuffle=True, num_workers=4)
+        return DataLoader(self.train_dataset, self.hparams.batch_size, shuffle=True, num_workers=4)
 
     @pl.data_loader
     def val_dataloader(self):

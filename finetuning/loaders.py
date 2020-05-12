@@ -6,13 +6,13 @@ from transformers import BertTokenizer
 from eval_probes_on_dataset import prepare_sentence_for_bert
 
 class SST(Dataset):
-    def __init__(self, args, data_path, debug=False):
+    def __init__(self, args, hparams, data_path, debug=False):
         super().__init__()
         self.data_path = data_path
         self.dataset = self._load_data_set()
         self.tokenizer = BertTokenizer.from_pretrained('bert-large-cased')
         self.device = args.device
-        self.max_seq_len = args.max_seq_len
+        self.max_seq_len = hparams.max_seq_len
         self.pad_token = "[PAD]"
         self.debug = debug
 

@@ -97,7 +97,7 @@ if __name__ == "__main__":
         val_percent_check=args.val_pct,
         checkpoint_callback=checkpoint_callback,
         early_stop_callback=early_stopping,
-        logger=comet_logger,
+        logger=comet_logger
     )
     
     if testing:
@@ -105,5 +105,11 @@ if __name__ == "__main__":
     else:
         trainer.fit(model)
     
-    model.bert.save_pretrained('../best_model')
+    try:
+        model_path = f'../best_models/{args.run_name}'
+        os.mkdir(model_path)
+    except:
+        pass
+    
+    model.bert.save_pretrained(model_path)
     
