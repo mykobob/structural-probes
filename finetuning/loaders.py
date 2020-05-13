@@ -6,11 +6,11 @@ from transformers import BertTokenizer
 from eval_probes_on_dataset import prepare_sentence_for_bert
 
 class SST(Dataset):
-    def __init__(self, args, hparams, data_path, debug=False):
+    def __init__(self, args, hparams, data_path, tokenizer, debug=False):
         super().__init__()
         self.data_path = data_path
         self.dataset = self._load_data_set()
-        self.tokenizer = BertTokenizer.from_pretrained('bert-large-cased')
+        self.tokenizer = tokenizer
         self.device = args.device
         self.max_seq_len = hparams.max_seq_len
         self.pad_token = "[PAD]"
@@ -26,6 +26,7 @@ class SST(Dataset):
         sentiment = row["sentiment"]
 
         _, tokenized_tensor, segments_tensors = prepare_sentence_for_bert(sentence, self.tokenizer, max_seq_len=self.max_seq_len)
+#         print(tokenized_tensor.shape, segments_tensors.shape)
         data = {
             'sentence_tensor': tokenized_tensor,
             'attn_mask': segments_tensors,

@@ -25,6 +25,7 @@ import reporter
 import task
 import loss
 import run_experiment
+import pdb
 
 from transformers import BertTokenizer, BertModel, BertForSequenceClassification, BertConfig
 
@@ -44,7 +45,10 @@ def get_word_depths(args, words, prediction, sent_index):
 
 def prepare_sentence_for_bert(line, tokenizer, max_seq_len=64):
     untokenized_sent = line.strip().split()
+    untokenized_sent = untokenized_sent[:max_seq_len - 2]
     tokenized_sent = tokenizer.wordpiece_tokenizer.tokenize('[CLS] ' + ' '.join(untokenized_sent) + ' [SEP]')
+    if len(tokenized_sent) > max_seq_len:
+        tokenized_sent = tokenized_sent[:max_seq_len - 1] + ['[SEP]']
     tokenized_sent = tokenized_sent + ['[PAD]'] * (max_seq_len - len(tokenized_sent))
     untok_tok_mapping = data.SubwordDataset.match_tokenized_to_untokenized(tokenized_sent, untokenized_sent)
 
@@ -53,6 +57,12 @@ def prepare_sentence_for_bert(line, tokenizer, max_seq_len=64):
 
     tokens_tensor = torch.tensor(indexed_tokens)
     segments_tensors = torch.tensor(segment_ids)
+    if tokens_tensor.shape[0] > max_seq_len:
+        print('='*80) 
+        print('PROBLEM')
+        print(tokens_tensor.shape[0])
+        print(len(untokenized_sent))
+        print(tokenized_sent)
     return (untokenized_sent, untok_tok_mapping), tokens_tensor, segments_tensors
 
 

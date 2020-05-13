@@ -28,8 +28,9 @@ class SST_Test(pl.LightningModule):
         self.log = self._config_logger()
         self.hparams = hparams
 
-        self.train_dataset = SST(args, hparams, args.sst_train_path)
-        self.val_dataset =   SST(args, hparams, args.sst_val_path)
+        tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
+        self.train_dataset = SST(args, hparams, args.sst_train_path, tokenizer)
+        self.val_dataset =   SST(args, hparams, args.sst_val_path, tokenizer)
 
         self.bert = self.create_model(args.device)
         self.training_acc = []
@@ -37,17 +38,22 @@ class SST_Test(pl.LightningModule):
 
 
     def create_model(self, device):
-        config = BertConfig.from_pretrained('bert-large-cased')
+        config = BertConfig.from_pretrained('bert-base-cased')
         config.output_hidden_states=True
         config.num_labels = 1
-        bert = BertForSequenceClassification.from_pretrained('bert-large-cased', config=config).to(device)
+        bert = BertForSequenceClassification.from_pretrained('bert-base-cased', config=config).to(device)
         bert = self.freeze_bert(bert)
 
         return bert
 
     def freeze_bert(self, bert):
+        unfreeze_layers = '11'.split()
         # Freeze layers of bert
         for name, param in bert.named_parameters():
+            for layer in unfreeze_layers:
+                if layer in name:
+                    print(f"{name} is unfrozen")
+                    param.requires_grad = True
             if not "classifier" in name:
                 param.requires_grad = False
             else:
