@@ -21,19 +21,22 @@
 
 # Train sections
 for i in `seq -f "%03g" 1 181`; do
-        cat /home/mli/nltk_data/corpora/treebank/combined/wsj_0$i.mrg
+        cat /work/06129/mbli/maverick2/CS391D_Final_Project/data/SST-2/original_sst/wsj_0$i.mrg
+        #cat /home/mli/nltk_data/corpora/treebank/combined/wsj_0$i.mrg
         #cat /home/mli/School/data_mining/CS391D_Final_Project/code/lib/data/penn-treebank/ptb.train.txt
 done > ptb3-wsj-train.trees
 
 # Dev sections
 for i in `seq -f "%03g" 182 190`; do
-        cat /home/mli/nltk_data/corpora/treebank/combined/wsj_0$i.mrg
+        cat /work/06129/mbli/maverick2/CS391D_Final_Project/data/SST-2/original_sst/wsj_0$i.mrg
+        #cat /home/mli/nltk_data/corpora/treebank/combined/wsj_0$i.mrg
         #cat /home/mli/School/data_mining/CS391D_Final_Project/code/lib/data/penn-treebank/ptb.valid.txt
 done > ptb3-wsj-dev.trees
 
 # Test sections
 for i in `seq -f "%03g" 191 199`; do
-        cat /home/mli/nltk_data/corpora/treebank/combined/wsj_0$i.mrg
+        cat /work/06129/mbli/maverick2/CS391D_Final_Project/data/SST-2/original_sst/wsj_0$i.mrg
+        #cat /home/mli/nltk_data/corpora/treebank/combined/wsj_0$i.mrg
         #cat /home/mli/School/data_mining/CS391D_Final_Project/code/lib/data/penn-treebank/ptb.test.txt
 done > ptb3-wsj-test.trees
 

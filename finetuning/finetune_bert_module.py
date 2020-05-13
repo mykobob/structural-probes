@@ -36,6 +36,10 @@ class SST_Test(pl.LightningModule):
         self.training_acc = []
         self.val_acc = []
 
+        #self.loss = nn.MSELoss()
+        self.loss = nn.CrossEntropyLoss()
+        self.do_sigmoid = 'MSELoss' in type(self.loss)
+
 
     def create_model(self, device):
         config = BertConfig.from_pretrained('bert-base-cased')
@@ -52,8 +56,15 @@ class SST_Test(pl.LightningModule):
         for name, param in bert.named_parameters():
             for layer in unfreeze_layers:
                 if layer in name:
+                    param.requires_grad = True
+        to_unfreeze = '11'.split()
+        # Freeze layers of bert
+        for name, param in bert.named_parameters():
+            for layer_num in to_unfreeze:
+                if layer_num in name:
                     print(f"{name} is unfrozen")
                     param.requires_grad = True
+
             if not "classifier" in name:
                 param.requires_grad = False
             else:
@@ -65,7 +76,8 @@ class SST_Test(pl.LightningModule):
         bert_out, encoded_layers = self.bert(x, attention_mask=attn_mask)
 
         #output = bert_out[0].squeeze(1)
-        output = sigmoid(bert_out)
+        if self.do_sigmoid:
+            output = sigmoid(bert_out)
         
 #         import pdb; pdb.set_trace()
         return output
@@ -79,7 +91,7 @@ class SST_Test(pl.LightningModule):
 
         correct = determine_correctness(pred, label)
         self.training_acc.append(correct.clone().detach().float())
-        loss = F.mse_loss(pred, label, reduction='mean')  # , pos_weight=self.pos_weight)
+        loss = self.loss(pred, label, reduction='mean')  # , pos_weight=self.pos_weight)
         #loss = torch.exp(log_loss)
 
         try:
@@ -94,12 +106,12 @@ class SST_Test(pl.LightningModule):
 
     def on_epoch_end(self):
         training_acc_tensor = torch.stack(self.training_acc)
-        avg_mse = {"mse": training_acc_tensor.mean()}
+        avg_loss = {"loss": training_acc_tensor.mean()}
 #         self.logger.log_metrics(avg_mse, step=self.global_step)
 
         # clear training_acc
         self.training_acc = []
-        return avg_mse
+        return avg_loss
 
     def validation_step(self, batch, batch_nb):
         sent_tensor = batch['sentence_tensor']
@@ -108,7 +120,7 @@ class SST_Test(pl.LightningModule):
 
         pred = self.forward(sent_tensor, attn_mask)
 
-        loss = F.mse_loss(pred, label, reduction='mean')
+        loss = self.loss(pred, label, reduction='mean')
 
         return {'val_loss': loss.clone().detach(),
                 'predicted': pred.detach()}
@@ -158,7 +170,7 @@ class SST_Test(pl.LightningModule):
 
     @pl.data_loader
     def train_dataloader(self):
-        self.log.info(f"Training dataset has {len(self.train_dataset)} examples")
+        self.log.info(f"Training dataset has {len(self.train_dataset)} examples, and batch_size of {self.hparams.batch_size}")
         return DataLoader(self.train_dataset, self.hparams.batch_size, shuffle=True, num_workers=4)
 
     @pl.data_loader
