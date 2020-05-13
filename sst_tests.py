@@ -21,7 +21,7 @@ from transformers import BertConfig, BertTokenizer, BertForSequenceClassificatio
 
 
 def setup_args_and_folder(): 
-    CONFIG_FILE = 'example/config/bert_ptb3.yaml'
+    CONFIG_FILE = 'example/config/bert_base_distance_ptb3.yaml'
     EXPERIMENT_NAME = ''
     SEED = 123
 
@@ -40,7 +40,7 @@ def setup_args_and_folder():
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     yaml_args['device'] = device
-    yaml_args['model_type'] = 'large'
+    yaml_args['model_type'] = 'base'
     return yaml_args
 
 yaml_args = setup_args_and_folder()
@@ -133,7 +133,7 @@ if yaml_args['model_type'] == 'large':
     config = BertConfig.from_pretrained('bert-large-cased')
     config.output_hidden_states=True
     config.num_labels = 1
-    model = BertForSequenceClassification.from_pretrained('finetuning/lightning_logs/regression_testing', config=config)
+    model = BertForSequenceClassification.from_pretrained('best_models/classification', config=config)
     LAYER_COUNT = 24
     FEATURE_COUNT = 1024
 else:
@@ -141,13 +141,13 @@ else:
     config = BertConfig.from_pretrained('bert-base-cased')
     config.output_hidden_states=True
     config.num_labels = 1
-    model = BertForSequenceClassification.from_pretrained('finetuning/lightning_logs/regression_testing', config=config)
+    model = BertForSequenceClassification.from_pretrained('best_models/classification', config=config)
     LAYER_COUNT = 12
     FEATURE_COUNT = 768
-model.to(args['device'])
+model.to(yaml_args['device'])
 model.eval()
 
-word_dists, word_depths, predicted_edges, tokenizer = eval_probes_on_dataset.report_on_stdin(yaml_args, dev_sentiment)
+word_dists, word_depths, predicted_edges = eval_probes_on_dataset.use_probes(yaml_args, dev_sentiment, model, tokenizer)
 
 
 # In[7]:
