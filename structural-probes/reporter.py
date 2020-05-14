@@ -181,7 +181,6 @@ class WordPairReporter(Reporter):
       dataset: A sequence of batches of Observations
       split_name the string naming the data split: {train,dev,test}
     """
-    import pdb; pdb.set_trace()
     uspan_total = 0
     uspan_correct = 0
     total_sents = 0

@@ -9,6 +9,7 @@ class SST(Dataset):
     def __init__(self, args, hparams, data_path, tokenizer, debug=False):
         super().__init__()
         self.data_path = data_path
+        self.categorical = 'cat' in data_path
         self.dataset = self._load_data_set()
         self.tokenizer = tokenizer
         self.device = args.device
@@ -29,7 +30,7 @@ class SST(Dataset):
         data = {
             'sentence_tensor': tokenized_tensor,
             'attn_mask': segments_tensors,
-            'label': torch.tensor([sentiment]).float()
+            'label': torch.tensor(sentiment) if self.categorical else torch.tensor([sentiment])
         }
 
         return data

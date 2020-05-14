@@ -38,7 +38,7 @@ class SST_Test(pl.LightningModule):
 
         #self.loss = nn.MSELoss()
         self.loss = nn.CrossEntropyLoss()
-        self.do_sigmoid = 'MSELoss' in type(self.loss)
+        self.do_sigmoid = 'MSELoss' in str(type(self.loss))
 
 
     def create_model(self, device):
@@ -46,7 +46,7 @@ class SST_Test(pl.LightningModule):
         config.output_hidden_states=True
         config.num_labels = 1
         bert = BertForSequenceClassification.from_pretrained('bert-base-cased', config=config).to(device)
-        bert = self.freeze_bert(bert)
+        #bert = self.freeze_bert(bert)
 
         return bert
 
@@ -78,6 +78,8 @@ class SST_Test(pl.LightningModule):
         #output = bert_out[0].squeeze(1)
         if self.do_sigmoid:
             output = sigmoid(bert_out)
+        else:
+            output = bert_out
         
 #         import pdb; pdb.set_trace()
         return output
@@ -91,7 +93,10 @@ class SST_Test(pl.LightningModule):
 
         correct = determine_correctness(pred, label)
         self.training_acc.append(correct.clone().detach().float())
-        loss = self.loss(pred, label, reduction='mean')  # , pos_weight=self.pos_weight)
+        if self.do_sigmoid:
+            loss = self.loss(pred, label, reduction='mean')  # , pos_weight=self.pos_weight)
+        else:
+            loss = self.loss(pred, label)
         #loss = torch.exp(log_loss)
 
         try:
@@ -120,7 +125,10 @@ class SST_Test(pl.LightningModule):
 
         pred = self.forward(sent_tensor, attn_mask)
 
-        loss = self.loss(pred, label, reduction='mean')
+        if self.do_sigmoid:
+            loss = self.loss(pred, label, reduction='mean')
+        else:
+            loss = self.loss(pred, label)
 
         return {'val_loss': loss.clone().detach(),
                 'predicted': pred.detach()}

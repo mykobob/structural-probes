@@ -84,7 +84,7 @@ class ProbeRegimen:
                 torch.save(probe.state_dict(), self.params_path)
                 min_dev_loss = epoch_dev_loss / epoch_dev_loss_count
                 min_dev_loss_epoch = epoch_index
-                tqdm.write('Saving probe parameters')
+                tqdm.write(f'Saving probe parameters to {self.params_path}')
             elif min_dev_loss_epoch < epoch_index - 4:
                 tqdm.write('Early stopping')
                 break
