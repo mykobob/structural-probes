@@ -15,13 +15,14 @@ import pandas as pd
 import eval_probes_on_dataset
 import jupyter_slack
 from transformers import BertConfig, BertTokenizer, BertForSequenceClassification
+from sklearn.metrics import f1_score
 
 
 # In[2]:
 
 
 def setup_args_and_folder(): 
-    CONFIG_FILE = 'example/config/bert_ptb3.yaml'
+    CONFIG_FILE = 'example/config/bert_base_distance_ptb3.yaml'
     EXPERIMENT_NAME = ''
     SEED = 123
 
@@ -40,7 +41,7 @@ def setup_args_and_folder():
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     yaml_args['device'] = device
-    yaml_args['model_type'] = 'large'
+    yaml_args['model_type'] = 'base'
     return yaml_args
 
 yaml_args = setup_args_and_folder()
@@ -103,8 +104,8 @@ def read_sentiment_sentences(path):
 
 data_base = Path('../../../data/SST-2')
 
-train_path = data_base / 'sentence_splits' / 'train.tsv'
-dev_path = data_base / 'sentence_splits' / 'dev.tsv'
+train_path = data_base / 'sentence_splits' / 'train_cat.tsv'
+dev_path = data_base / 'sentence_splits' / 'dev_cat.tsv'
 
 # read in SST dataset
 sst_trees_base = data_base / 'tree_format/'
@@ -133,7 +134,7 @@ if yaml_args['model_type'] == 'large':
     config = BertConfig.from_pretrained('bert-large-cased')
     config.output_hidden_states=True
     config.num_labels = 1
-    model = BertForSequenceClassification.from_pretrained('finetuning/lightning_logs/regression_testing', config=config)
+    model = BertForSequenceClassification.from_pretrained('best_models/bert_base', config=config)
     LAYER_COUNT = 24
     FEATURE_COUNT = 1024
 else:
@@ -141,21 +142,29 @@ else:
     config = BertConfig.from_pretrained('bert-base-cased')
     config.output_hidden_states=True
     config.num_labels = 1
-    model = BertForSequenceClassification.from_pretrained('finetuning/lightning_logs/regression_testing', config=config)
+    model = BertForSequenceClassification.from_pretrained('best_models/bert_base', config=config)
     LAYER_COUNT = 12
     FEATURE_COUNT = 768
-model.to(args['device'])
+model.to(yaml_args['device'])
 model.eval()
 
-word_dists, word_depths, predicted_edges, tokenizer = eval_probes_on_dataset.report_on_stdin(yaml_args, dev_sentiment)
+word_dists, word_depths, predicted_edges = eval_probes_on_dataset.use_probes(yaml_args, dev_sentiment, model, tokenizer)
 
 
 # In[7]:
 
 
 sigmoid = torch.nn.Sigmoid()
-for line in tqdm(dev_sentiment, desc='Eval Dev Sentiment'):
+mse = 0
+guessing_0 = 0
+guessing_1 = 0
+preds = []
+labels = []
+for idx, line in tqdm(enumerate(dev_sentiment), desc='Eval Dev Sentiment'):
     _, tokens_tensor, segments_tensors = eval_probes_on_dataset.prepare_sentence_for_bert(line, tokenizer)
+    line_label = int(dev_labels[idx])
+    guessing_0 += line_label ** 2
+    guessing_1 += (1 - line_label) ** 2
 
     device = yaml_args['device']
     tokens_tensor = tokens_tensor.unsqueeze(0).to(device)
@@ -163,7 +172,15 @@ for line in tqdm(dev_sentiment, desc='Eval Dev Sentiment'):
     with torch.no_grad():
         logits, encoded_layers = model(tokens_tensor, segments_tensors)
         probs = sigmoid(logits)
-        print(probs)
+        mse += (line_label - probs.item()) ** 2
+        preds.append(probs.item())
+    labels.append(line_label)
+
+print('Higher is bad', mse / len(dev_sentiment))
+print('All 0', guessing_0 / len(dev_sentiment))
+print('All 1', guessing_1 / len(dev_sentiment))
+print('f1', f1_score(labels, preds))
+
 
 
 # In[8]:

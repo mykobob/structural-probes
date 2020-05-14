@@ -237,6 +237,7 @@ if __name__ == '__main__':
 
   yaml_args= yaml.load(open(cli_args.experiment_config), Loader=yaml.FullLoader)
   setup_new_experiment_dir(cli_args, yaml_args, cli_args.results_dir)
-  device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+#   device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+  device = torch.device("cpu")
   yaml_args['device'] = device
   execute_experiment(yaml_args, train_probe=cli_args.train_probe, report_results=cli_args.report_results)

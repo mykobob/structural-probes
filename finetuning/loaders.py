@@ -26,34 +26,12 @@ class SST(Dataset):
         sentiment = row["sentiment"]
 
         _, tokenized_tensor, segments_tensors = prepare_sentence_for_bert(sentence, self.tokenizer, max_seq_len=self.max_seq_len)
-#         print(tokenized_tensor.shape, segments_tensors.shape)
         data = {
             'sentence_tensor': tokenized_tensor,
             'attn_mask': segments_tensors,
             'label': torch.tensor([sentiment]).float()
         }
 
-        # Need to do tokenization here so that it can be run in batches
-        #tokenized_sent = self.tokenizer.tokenize(sentence)
-
-        #sent_tokens = ["[CLS]"] + tokenized_sent + ["[SEP]"]
-
-        ## Pad the tokens on the right so that all sequences are the same length
-        #sent_tokens = sent_tokens + [self.pad_token for _ in range(self.max_seq_len - len(sent_tokens))]
-
-        #sent_ids = self.tokenizer.convert_tokens_to_ids(sent_tokens)
-        #sent_tensor = torch.tensor(sent_ids).to(self.device)
-
-        #segment_ids = [0 if x < len(tokenized_sent) else 1 for x in
-        #               range(len(sent_tokens))]  # + [1 for _ in range(len(q2_token))]
-        #segment_tensor = torch.tensor(segment_ids).to(self.device)
-
-        #attention_mask = [1 if x != '[PAD]' else 0 for x in sent_tokens]
-        #attn_mask_tensor = torch.tensor(attention_mask).to(self.device)
-
-        #data = {'sentence_tensor': sent_tensor, 
-        #        'attn_mask': attn_mask_tensor,
-        #        'label': torch.tensor(sentiment).float().to(self.device)}
         return data
 
 
