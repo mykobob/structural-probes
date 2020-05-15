@@ -1,0 +1,56 @@
+dataset:
+  observation_fieldnames:
+     - index
+     - sentence
+     - lemma_sentence
+     - upos_sentence
+     - xpos_sentence
+     - morph
+     - head_indices
+     - governance_relations
+     - secondary_relations
+     - extra_info
+     - embeddings
+  corpus:
+    root: /home/garysnake/Desktop/structural-probes/experiments/data/cola_public/raw
+    train_path: in_domain_train.conllx
+    dev_path: in_domain_dev.conllx
+    test_path: out_of_domain_dev.conllx
+  embeddings:
+    type: token #{token,subword}
+    root: /home/garysnake/Desktop/structural-probes/experiments/data/cola_public/bert
+    train_path: in_domain_train.hdf5
+    dev_path: in_domain_dev.hdf5
+    test_path: out_of_domain_dev.hdf5
+  batch_size: 40
+model:
+  hidden_dim: 768 # BERT hidden dim
+  model_type: BERT-disk # BERT-disk, ELMo-disk, 
+  use_disk: True 
+  model_layer: 11 # BERT-base: {0,...,11}; BERT-large: {0, 23}
+probe:
+  task_signature: word_pair # word, word_pair
+  task_name: parse-distance
+  maximum_rank: 768
+  psd_parameters: True
+  diagonal: False
+  # depth_params_path:    example/data/bertbase16-depth-probe.params
+  distance_params_path: /home/garysnake/Desktop/structural-probes/experiments/results/cola/bert_cola_distance/bertbase16-distance-probe.params
+  params_path: bertbase16-distance-probe.params
+probe_training:
+  epochs: 30
+  loss: L1
+reporting:
+  root: /home/garysnake/Desktop/structural-probes/experiments/results/cola/bert_cola_distance
+  observation_paths:
+    train_path: train.observations
+    dev_path: dev.observations
+    test_path: test.observations
+  prediction_paths:
+    train_path: train.predictions
+    dev_path: dev.predictions
+    test_path: test.predictions
+  reporting_methods:
+    - spearmanr
+      #- image_examples
+    - uuas
