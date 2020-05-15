@@ -1,0 +1,852 @@
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    It\& 's\& a\& lovely\& film\& with\& lovely\& performances\& by\& Buy\& and\& Accorsi\& . \\
+\end{deptext}
+\depedge{1}{5}{.}
+\depedge{2}{5}{.}
+\depedge{3}{5}{.}
+\depedge{4}{5}{.}
+\depedge{5}{6}{.}
+\depedge{6}{8}{.}
+\depedge{7}{8}{.}
+\depedge{8}{9}{.}
+\depedge{9}{10}{.}
+\depedge{10}{11}{.}
+\depedge{10}{12}{.}
+\depedge[edge style={red!60!}, edge below]{4}{7}{.}
+\depedge[edge style={red!60!}, edge below]{1}{5}{.}
+\depedge[edge style={red!60!}, edge below]{1}{2}{.}
+\depedge[edge style={red!60!}, edge below]{1}{3}{.}
+\depedge[edge style={red!60!}, edge below]{8}{9}{.}
+\depedge[edge style={red!60!}, edge below]{3}{4}{.}
+\depedge[edge style={red!60!}, edge below]{5}{6}{.}
+\depedge[edge style={red!60!}, edge below]{6}{9}{.}
+\depedge[edge style={red!60!}, edge below]{10}{12}{.}
+\depedge[edge style={red!60!}, edge below]{8}{12}{.}
+\depedge[edge style={red!60!}, edge below]{11}{12}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    No\& one\& goes\& unindicted\& here\& ,\& which\& is\& probably\& for\& the\& best\& . \\
+\end{deptext}
+\depedge{1}{2}{.}
+\depedge{2}{3}{.}
+\depedge{3}{4}{.}
+\depedge{4}{5}{.}
+\depedge{4}{8}{.}
+\depedge{7}{8}{.}
+\depedge{8}{9}{.}
+\depedge{8}{10}{.}
+\depedge{10}{12}{.}
+\depedge{11}{12}{.}
+\depedge[edge style={red!60!}, edge below]{7}{8}{.}
+\depedge[edge style={red!60!}, edge below]{8}{9}{.}
+\depedge[edge style={red!60!}, edge below]{2}{3}{.}
+\depedge[edge style={red!60!}, edge below]{3}{4}{.}
+\depedge[edge style={red!60!}, edge below]{9}{10}{.}
+\depedge[edge style={red!60!}, edge below]{2}{5}{.}
+\depedge[edge style={red!60!}, edge below]{1}{2}{.}
+\depedge[edge style={red!60!}, edge below]{10}{12}{.}
+\depedge[edge style={red!60!}, edge below]{2}{8}{.}
+\depedge[edge style={red!60!}, edge below]{10}{11}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    And\& if\& you\& 're\& not\& nearly\& moved\& to\& tears\& by\& a\& couple\& of\& scenes\& ,\& you\& 've\& got\& ice\& water\& in\& your\& veins\& . \\
+\end{deptext}
+\depedge{1}{18}{.}
+\depedge{2}{7}{.}
+\depedge{3}{7}{.}
+\depedge{4}{7}{.}
+\depedge{5}{7}{.}
+\depedge{6}{7}{.}
+\depedge{7}{8}{.}
+\depedge{7}{10}{.}
+\depedge{7}{18}{.}
+\depedge{8}{9}{.}
+\depedge{10}{12}{.}
+\depedge{11}{12}{.}
+\depedge{12}{13}{.}
+\depedge{13}{14}{.}
+\depedge{16}{18}{.}
+\depedge{17}{18}{.}
+\depedge{18}{20}{.}
+\depedge{19}{20}{.}
+\depedge{20}{21}{.}
+\depedge{21}{23}{.}
+\depedge{22}{23}{.}
+\depedge[edge style={red!60!}, edge below]{12}{13}{.}
+\depedge[edge style={red!60!}, edge below]{11}{12}{.}
+\depedge[edge style={red!60!}, edge below]{13}{14}{.}
+\depedge[edge style={red!60!}, edge below]{19}{20}{.}
+\depedge[edge style={red!60!}, edge below]{17}{18}{.}
+\depedge[edge style={red!60!}, edge below]{18}{21}{.}
+\depedge[edge style={red!60!}, edge below]{18}{20}{.}
+\depedge[edge style={red!60!}, edge below]{3}{4}{.}
+\depedge[edge style={red!60!}, edge below]{16}{18}{.}
+\depedge[edge style={red!60!}, edge below]{5}{6}{.}
+\depedge[edge style={red!60!}, edge below]{4}{5}{.}
+\depedge[edge style={red!60!}, edge below]{6}{7}{.}
+\depedge[edge style={red!60!}, edge below]{10}{12}{.}
+\depedge[edge style={red!60!}, edge below]{6}{10}{.}
+\depedge[edge style={red!60!}, edge below]{2}{3}{.}
+\depedge[edge style={red!60!}, edge below]{4}{17}{.}
+\depedge[edge style={red!60!}, edge below]{1}{18}{.}
+\depedge[edge style={red!60!}, edge below]{5}{9}{.}
+\depedge[edge style={red!60!}, edge below]{20}{23}{.}
+\depedge[edge style={red!60!}, edge below]{16}{22}{.}
+\depedge[edge style={red!60!}, edge below]{7}{8}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    A\& warm\& ,\& funny\& ,\& engaging\& film\& . \\
+\end{deptext}
+\depedge{1}{2}{.}
+\depedge{2}{4}{.}
+\depedge{2}{6}{.}
+\depedge{6}{7}{.}
+\depedge[edge style={red!60!}, edge below]{4}{6}{.}
+\depedge[edge style={red!60!}, edge below]{2}{4}{.}
+\depedge[edge style={red!60!}, edge below]{2}{7}{.}
+\depedge[edge style={red!60!}, edge below]{1}{7}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    Uses\& sharp\& humor\& and\& insight\& into\& human\& nature\& to\& examine\& class\& conflict\& ,\& adolescent\& yearning\& ,\& the\& roots\& of\& friendship\& and\& sexual\& identity\& . \\
+\end{deptext}
+\depedge{1}{3}{.}
+\depedge{1}{4}{.}
+\depedge{1}{5}{.}
+\depedge{2}{3}{.}
+\depedge{5}{6}{.}
+\depedge{5}{10}{.}
+\depedge{6}{8}{.}
+\depedge{7}{8}{.}
+\depedge{9}{10}{.}
+\depedge{10}{12}{.}
+\depedge{11}{12}{.}
+\depedge{12}{15}{.}
+\depedge{12}{18}{.}
+\depedge{12}{21}{.}
+\depedge{12}{23}{.}
+\depedge{14}{15}{.}
+\depedge{17}{18}{.}
+\depedge{18}{19}{.}
+\depedge{19}{20}{.}
+\depedge{22}{23}{.}
+\depedge[edge style={red!60!}, edge below]{3}{5}{.}
+\depedge[edge style={red!60!}, edge below]{2}{3}{.}
+\depedge[edge style={red!60!}, edge below]{11}{14}{.}
+\depedge[edge style={red!60!}, edge below]{20}{23}{.}
+\depedge[edge style={red!60!}, edge below]{17}{18}{.}
+\depedge[edge style={red!60!}, edge below]{12}{15}{.}
+\depedge[edge style={red!60!}, edge below]{19}{23}{.}
+\depedge[edge style={red!60!}, edge below]{9}{10}{.}
+\depedge[edge style={red!60!}, edge below]{8}{12}{.}
+\depedge[edge style={red!60!}, edge below]{3}{4}{.}
+\depedge[edge style={red!60!}, edge below]{7}{8}{.}
+\depedge[edge style={red!60!}, edge below]{15}{20}{.}
+\depedge[edge style={red!60!}, edge below]{6}{8}{.}
+\depedge[edge style={red!60!}, edge below]{17}{19}{.}
+\depedge[edge style={red!60!}, edge below]{10}{12}{.}
+\depedge[edge style={red!60!}, edge below]{1}{4}{.}
+\depedge[edge style={red!60!}, edge below]{11}{22}{.}
+\depedge[edge style={red!60!}, edge below]{20}{21}{.}
+\depedge[edge style={red!60!}, edge below]{5}{6}{.}
+\depedge[edge style={red!60!}, edge below]{7}{11}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    Half\& Submarine\& flick\& ,\& Half\& Ghost\& Story\& ,\& All\& in\& one\& criminally\& neglected\& film \\
+\end{deptext}
+\depedge{1}{3}{.}
+\depedge{2}{3}{.}
+\depedge{3}{7}{.}
+\depedge{3}{9}{.}
+\depedge{3}{13}{.}
+\depedge{5}{7}{.}
+\depedge{6}{7}{.}
+\depedge{9}{10}{.}
+\depedge{10}{12}{.}
+\depedge{11}{12}{.}
+\depedge{13}{14}{.}
+\depedge[edge style={red!60!}, edge below]{11}{14}{.}
+\depedge[edge style={red!60!}, edge below]{12}{13}{.}
+\depedge[edge style={red!60!}, edge below]{9}{10}{.}
+\depedge[edge style={red!60!}, edge below]{3}{7}{.}
+\depedge[edge style={red!60!}, edge below]{13}{14}{.}
+\depedge[edge style={red!60!}, edge below]{10}{11}{.}
+\depedge[edge style={red!60!}, edge below]{6}{7}{.}
+\depedge[edge style={red!60!}, edge below]{1}{3}{.}
+\depedge[edge style={red!60!}, edge below]{3}{14}{.}
+\depedge[edge style={red!60!}, edge below]{1}{5}{.}
+\depedge[edge style={red!60!}, edge below]{2}{7}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    Entertains\& by\& providing\& good\& ,\& lively\& company\& . \\
+\end{deptext}
+\depedge{1}{2}{.}
+\depedge{2}{3}{.}
+\depedge{3}{7}{.}
+\depedge{4}{7}{.}
+\depedge{6}{7}{.}
+\depedge[edge style={red!60!}, edge below]{4}{6}{.}
+\depedge[edge style={red!60!}, edge below]{6}{7}{.}
+\depedge[edge style={red!60!}, edge below]{2}{3}{.}
+\depedge[edge style={red!60!}, edge below]{3}{7}{.}
+\depedge[edge style={red!60!}, edge below]{1}{2}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    Visually\& imaginative\& ,\& thematically\& instructive\& and\& thoroughly\& delightful\& ,\& it\& takes\& us\& on\& a\& roller-coaster\& ride\& from\& innocence\& to\& experience\& without\& even\& a\& hint\& of\& that\& typical\& kiddie-flick\& sentimentality\& . \\
+\end{deptext}
+\depedge{1}{2}{.}
+\depedge{2}{5}{.}
+\depedge{2}{6}{.}
+\depedge{2}{8}{.}
+\depedge{2}{11}{.}
+\depedge{4}{5}{.}
+\depedge{7}{8}{.}
+\depedge{10}{11}{.}
+\depedge{11}{12}{.}
+\depedge{11}{13}{.}
+\depedge{11}{20}{.}
+\depedge{13}{16}{.}
+\depedge{14}{16}{.}
+\depedge{15}{16}{.}
+\depedge{16}{17}{.}
+\depedge{17}{18}{.}
+\depedge{19}{20}{.}
+\depedge{20}{21}{.}
+\depedge{21}{24}{.}
+\depedge{22}{24}{.}
+\depedge{23}{24}{.}
+\depedge{24}{25}{.}
+\depedge{25}{29}{.}
+\depedge{26}{29}{.}
+\depedge{27}{29}{.}
+\depedge{28}{29}{.}
+\depedge[edge style={red!60!}, edge below]{2}{5}{.}
+\depedge[edge style={red!60!}, edge below]{1}{4}{.}
+\depedge[edge style={red!60!}, edge below]{13}{16}{.}
+\depedge[edge style={red!60!}, edge below]{4}{5}{.}
+\depedge[edge style={red!60!}, edge below]{5}{8}{.}
+\depedge[edge style={red!60!}, edge below]{22}{24}{.}
+\depedge[edge style={red!60!}, edge below]{13}{14}{.}
+\depedge[edge style={red!60!}, edge below]{23}{25}{.}
+\depedge[edge style={red!60!}, edge below]{22}{23}{.}
+\depedge[edge style={red!60!}, edge below]{18}{20}{.}
+\depedge[edge style={red!60!}, edge below]{7}{8}{.}
+\depedge[edge style={red!60!}, edge below]{28}{29}{.}
+\depedge[edge style={red!60!}, edge below]{10}{11}{.}
+\depedge[edge style={red!60!}, edge below]{11}{13}{.}
+\depedge[edge style={red!60!}, edge below]{12}{13}{.}
+\depedge[edge style={red!60!}, edge below]{16}{17}{.}
+\depedge[edge style={red!60!}, edge below]{25}{26}{.}
+\depedge[edge style={red!60!}, edge below]{17}{18}{.}
+\depedge[edge style={red!60!}, edge below]{26}{27}{.}
+\depedge[edge style={red!60!}, edge below]{21}{22}{.}
+\depedge[edge style={red!60!}, edge below]{5}{17}{.}
+\depedge[edge style={red!60!}, edge below]{2}{6}{.}
+\depedge[edge style={red!60!}, edge below]{25}{29}{.}
+\depedge[edge style={red!60!}, edge below]{15}{16}{.}
+\depedge[edge style={red!60!}, edge below]{13}{21}{.}
+\depedge[edge style={red!60!}, edge below]{19}{20}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    Nothing\& 's\& at\& stake\& ,\& just\& a\& twisty\& double-cross\& you\& can\& smell\& a\& mile\& away\& --\& still\& ,\& the\& derivative\& Nine\& Queens\& is\& lots\& of\& fun\& . \\
+\end{deptext}
+\depedge{1}{2}{.}
+\depedge{2}{3}{.}
+\depedge{2}{24}{.}
+\depedge{3}{4}{.}
+\depedge{4}{9}{.}
+\depedge{6}{9}{.}
+\depedge{7}{9}{.}
+\depedge{8}{9}{.}
+\depedge{9}{12}{.}
+\depedge{10}{12}{.}
+\depedge{11}{12}{.}
+\depedge{12}{14}{.}
+\depedge{12}{15}{.}
+\depedge{13}{14}{.}
+\depedge{17}{24}{.}
+\depedge{19}{22}{.}
+\depedge{20}{22}{.}
+\depedge{21}{22}{.}
+\depedge{22}{24}{.}
+\depedge{23}{24}{.}
+\depedge{24}{25}{.}
+\depedge{25}{26}{.}
+\depedge[edge style={red!60!}, edge below]{24}{25}{.}
+\depedge[edge style={red!60!}, edge below]{23}{24}{.}
+\depedge[edge style={red!60!}, edge below]{24}{26}{.}
+\depedge[edge style={red!60!}, edge below]{20}{22}{.}
+\depedge[edge style={red!60!}, edge below]{21}{22}{.}
+\depedge[edge style={red!60!}, edge below]{7}{8}{.}
+\depedge[edge style={red!60!}, edge below]{12}{14}{.}
+\depedge[edge style={red!60!}, edge below]{13}{14}{.}
+\depedge[edge style={red!60!}, edge below]{8}{20}{.}
+\depedge[edge style={red!60!}, edge below]{8}{9}{.}
+\depedge[edge style={red!60!}, edge below]{7}{19}{.}
+\depedge[edge style={red!60!}, edge below]{6}{8}{.}
+\depedge[edge style={red!60!}, edge below]{1}{6}{.}
+\depedge[edge style={red!60!}, edge below]{22}{26}{.}
+\depedge[edge style={red!60!}, edge below]{17}{23}{.}
+\depedge[edge style={red!60!}, edge below]{14}{15}{.}
+\depedge[edge style={red!60!}, edge below]{1}{2}{.}
+\depedge[edge style={red!60!}, edge below]{11}{12}{.}
+\depedge[edge style={red!60!}, edge below]{3}{4}{.}
+\depedge[edge style={red!60!}, edge below]{10}{12}{.}
+\depedge[edge style={red!60!}, edge below]{2}{3}{.}
+\depedge[edge style={red!60!}, edge below]{12}{22}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    Unlike\& the\& speedy\& wham-bam\& effect\& of\& most\& Hollywood\& offerings\& ,\& character\& development\& --\& and\& more\& importantly\& ,\& character\& empathy\& --\& is\& at\& the\& heart\& of\& Italian\& for\& Beginners\& . \\
+\end{deptext}
+\depedge{1}{5}{.}
+\depedge{1}{21}{.}
+\depedge{2}{5}{.}
+\depedge{3}{5}{.}
+\depedge{4}{5}{.}
+\depedge{5}{6}{.}
+\depedge{6}{9}{.}
+\depedge{7}{9}{.}
+\depedge{8}{9}{.}
+\depedge{11}{12}{.}
+\depedge{12}{19}{.}
+\depedge{12}{21}{.}
+\depedge{14}{19}{.}
+\depedge{15}{16}{.}
+\depedge{16}{19}{.}
+\depedge{18}{19}{.}
+\depedge{21}{22}{.}
+\depedge{22}{24}{.}
+\depedge{23}{24}{.}
+\depedge{24}{25}{.}
+\depedge{25}{26}{.}
+\depedge{26}{27}{.}
+\depedge{27}{28}{.}
+\depedge[edge style={red!60!}, edge below]{22}{23}{.}
+\depedge[edge style={red!60!}, edge below]{21}{22}{.}
+\depedge[edge style={red!60!}, edge below]{24}{25}{.}
+\depedge[edge style={red!60!}, edge below]{23}{25}{.}
+\depedge[edge style={red!60!}, edge below]{3}{5}{.}
+\depedge[edge style={red!60!}, edge below]{11}{18}{.}
+\depedge[edge style={red!60!}, edge below]{6}{7}{.}
+\depedge[edge style={red!60!}, edge below]{6}{9}{.}
+\depedge[edge style={red!60!}, edge below]{9}{11}{.}
+\depedge[edge style={red!60!}, edge below]{2}{5}{.}
+\depedge[edge style={red!60!}, edge below]{8}{9}{.}
+\depedge[edge style={red!60!}, edge below]{5}{6}{.}
+\depedge[edge style={red!60!}, edge below]{4}{5}{.}
+\depedge[edge style={red!60!}, edge below]{5}{16}{.}
+\depedge[edge style={red!60!}, edge below]{15}{16}{.}
+\depedge[edge style={red!60!}, edge below]{25}{26}{.}
+\depedge[edge style={red!60!}, edge below]{27}{28}{.}
+\depedge[edge style={red!60!}, edge below]{14}{16}{.}
+\depedge[edge style={red!60!}, edge below]{11}{12}{.}
+\depedge[edge style={red!60!}, edge below]{18}{19}{.}
+\depedge[edge style={red!60!}, edge below]{1}{5}{.}
+\depedge[edge style={red!60!}, edge below]{5}{21}{.}
+\depedge[edge style={red!60!}, edge below]{25}{27}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    You\& 'll\& gasp\& appalled\& and\& laugh\& outraged\& and\& possibly\& ,\& watching\& the\& spectacle\& of\& a\& promising\& young\& lad\& treading\& desperately\& in\& a\& nasty\& sea\& ,\& shed\& an\& errant\& tear\& . \\
+\end{deptext}
+\depedge{1}{3}{.}
+\depedge{2}{3}{.}
+\depedge{3}{4}{.}
+\depedge{3}{5}{.}
+\depedge{3}{6}{.}
+\depedge{3}{8}{.}
+\depedge{3}{26}{.}
+\depedge{6}{7}{.}
+\depedge{9}{26}{.}
+\depedge{11}{13}{.}
+\depedge{11}{26}{.}
+\depedge{12}{13}{.}
+\depedge{13}{14}{.}
+\depedge{14}{18}{.}
+\depedge{15}{18}{.}
+\depedge{16}{18}{.}
+\depedge{17}{18}{.}
+\depedge{18}{19}{.}
+\depedge{19}{20}{.}
+\depedge{19}{21}{.}
+\depedge{21}{24}{.}
+\depedge{22}{24}{.}
+\depedge{23}{24}{.}
+\depedge{26}{29}{.}
+\depedge{27}{28}{.}
+\depedge{28}{29}{.}
+\depedge[edge style={red!60!}, edge below]{4}{7}{.}
+\depedge[edge style={red!60!}, edge below]{3}{6}{.}
+\depedge[edge style={red!60!}, edge below]{11}{13}{.}
+\depedge[edge style={red!60!}, edge below]{6}{7}{.}
+\depedge[edge style={red!60!}, edge below]{19}{20}{.}
+\depedge[edge style={red!60!}, edge below]{17}{18}{.}
+\depedge[edge style={red!60!}, edge below]{19}{21}{.}
+\depedge[edge style={red!60!}, edge below]{13}{14}{.}
+\depedge[edge style={red!60!}, edge below]{5}{8}{.}
+\depedge[edge style={red!60!}, edge below]{18}{19}{.}
+\depedge[edge style={red!60!}, edge below]{12}{14}{.}
+\depedge[edge style={red!60!}, edge below]{21}{24}{.}
+\depedge[edge style={red!60!}, edge below]{12}{15}{.}
+\depedge[edge style={red!60!}, edge below]{16}{18}{.}
+\depedge[edge style={red!60!}, edge below]{23}{24}{.}
+\depedge[edge style={red!60!}, edge below]{15}{22}{.}
+\depedge[edge style={red!60!}, edge below]{11}{19}{.}
+\depedge[edge style={red!60!}, edge below]{28}{29}{.}
+\depedge[edge style={red!60!}, edge below]{20}{28}{.}
+\depedge[edge style={red!60!}, edge below]{2}{3}{.}
+\depedge[edge style={red!60!}, edge below]{4}{5}{.}
+\depedge[edge style={red!60!}, edge below]{1}{2}{.}
+\depedge[edge style={red!60!}, edge below]{7}{11}{.}
+\depedge[edge style={red!60!}, edge below]{7}{9}{.}
+\depedge[edge style={red!60!}, edge below]{26}{29}{.}
+\depedge[edge style={red!60!}, edge below]{27}{29}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    Although\& German\& cooking\& does\& not\& come\& readily\& to\& mind\& when\& considering\& the\& world\& 's\& best\& cuisine\& ,\& Mostly\& Martha\& could\& make\& Deutchland\& a\& popular\& destination\& for\& hungry\& tourists\& . \\
+\end{deptext}
+\depedge{1}{6}{.}
+\depedge{2}{3}{.}
+\depedge{3}{6}{.}
+\depedge{4}{6}{.}
+\depedge{5}{6}{.}
+\depedge{6}{7}{.}
+\depedge{6}{9}{.}
+\depedge{6}{21}{.}
+\depedge{8}{9}{.}
+\depedge{9}{11}{.}
+\depedge{10}{11}{.}
+\depedge{11}{16}{.}
+\depedge{12}{13}{.}
+\depedge{13}{14}{.}
+\depedge{13}{16}{.}
+\depedge{15}{16}{.}
+\depedge{18}{19}{.}
+\depedge{19}{21}{.}
+\depedge{20}{21}{.}
+\depedge{21}{25}{.}
+\depedge{22}{25}{.}
+\depedge{23}{25}{.}
+\depedge{24}{25}{.}
+\depedge{25}{26}{.}
+\depedge{26}{28}{.}
+\depedge{27}{28}{.}
+\depedge[edge style={red!60!}, edge below]{24}{25}{.}
+\depedge[edge style={red!60!}, edge below]{4}{5}{.}
+\depedge[edge style={red!60!}, edge below]{20}{21}{.}
+\depedge[edge style={red!60!}, edge below]{23}{25}{.}
+\depedge[edge style={red!60!}, edge below]{18}{19}{.}
+\depedge[edge style={red!60!}, edge below]{2}{3}{.}
+\depedge[edge style={red!60!}, edge below]{4}{6}{.}
+\depedge[edge style={red!60!}, edge below]{3}{7}{.}
+\depedge[edge style={red!60!}, edge below]{15}{16}{.}
+\depedge[edge style={red!60!}, edge below]{6}{7}{.}
+\depedge[edge style={red!60!}, edge below]{7}{9}{.}
+\depedge[edge style={red!60!}, edge below]{10}{11}{.}
+\depedge[edge style={red!60!}, edge below]{25}{26}{.}
+\depedge[edge style={red!60!}, edge below]{1}{4}{.}
+\depedge[edge style={red!60!}, edge below]{5}{11}{.}
+\depedge[edge style={red!60!}, edge below]{26}{27}{.}
+\depedge[edge style={red!60!}, edge below]{27}{28}{.}
+\depedge[edge style={red!60!}, edge below]{18}{20}{.}
+\depedge[edge style={red!60!}, edge below]{21}{23}{.}
+\depedge[edge style={red!60!}, edge below]{12}{13}{.}
+\depedge[edge style={red!60!}, edge below]{7}{8}{.}
+\depedge[edge style={red!60!}, edge below]{22}{23}{.}
+\depedge[edge style={red!60!}, edge below]{13}{15}{.}
+\depedge[edge style={red!60!}, edge below]{12}{14}{.}
+\depedge[edge style={red!60!}, edge below]{11}{16}{.}
+\depedge[edge style={red!60!}, edge below]{4}{20}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    A\& beguiling\& splash\& of\& pastel\& colors\& and\& prankish\& comedy\& from\& Disney\& . \\
+\end{deptext}
+\depedge{1}{3}{.}
+\depedge{2}{3}{.}
+\depedge{3}{4}{.}
+\depedge{4}{6}{.}
+\depedge{5}{6}{.}
+\depedge{6}{7}{.}
+\depedge{6}{9}{.}
+\depedge{6}{10}{.}
+\depedge{8}{9}{.}
+\depedge{10}{11}{.}
+\depedge[edge style={red!60!}, edge below]{3}{4}{.}
+\depedge[edge style={red!60!}, edge below]{5}{6}{.}
+\depedge[edge style={red!60!}, edge below]{1}{3}{.}
+\depedge[edge style={red!60!}, edge below]{8}{9}{.}
+\depedge[edge style={red!60!}, edge below]{4}{6}{.}
+\depedge[edge style={red!60!}, edge below]{6}{9}{.}
+\depedge[edge style={red!60!}, edge below]{7}{9}{.}
+\depedge[edge style={red!60!}, edge below]{2}{3}{.}
+\depedge[edge style={red!60!}, edge below]{10}{11}{.}
+\depedge[edge style={red!60!}, edge below]{9}{10}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    As\& surreal\& as\& a\& dream\& and\& as\& detailed\& as\& a\& photograph\& ,\& as\& visually\& dexterous\& as\& it\& is\& at\& times\& imaginatively\& overwhelming\& . \\
+\end{deptext}
+\depedge{1}{2}{.}
+\depedge{1}{15}{.}
+\depedge{2}{3}{.}
+\depedge{2}{6}{.}
+\depedge{2}{8}{.}
+\depedge{3}{5}{.}
+\depedge{4}{5}{.}
+\depedge{7}{8}{.}
+\depedge{8}{9}{.}
+\depedge{9}{11}{.}
+\depedge{10}{11}{.}
+\depedge{13}{14}{.}
+\depedge{14}{15}{.}
+\depedge{15}{22}{.}
+\depedge{16}{22}{.}
+\depedge{17}{22}{.}
+\depedge{18}{22}{.}
+\depedge{19}{20}{.}
+\depedge{19}{22}{.}
+\depedge{21}{22}{.}
+\depedge[edge style={red!60!}, edge below]{2}{8}{.}
+\depedge[edge style={red!60!}, edge below]{18}{22}{.}
+\depedge[edge style={red!60!}, edge below]{19}{22}{.}
+\depedge[edge style={red!60!}, edge below]{3}{9}{.}
+\depedge[edge style={red!60!}, edge below]{4}{10}{.}
+\depedge[edge style={red!60!}, edge below]{1}{7}{.}
+\depedge[edge style={red!60!}, edge below]{1}{13}{.}
+\depedge[edge style={red!60!}, edge below]{2}{22}{.}
+\depedge[edge style={red!60!}, edge below]{5}{11}{.}
+\depedge[edge style={red!60!}, edge below]{2}{14}{.}
+\depedge[edge style={red!60!}, edge below]{19}{20}{.}
+\depedge[edge style={red!60!}, edge below]{13}{16}{.}
+\depedge[edge style={red!60!}, edge below]{13}{18}{.}
+\depedge[edge style={red!60!}, edge below]{8}{11}{.}
+\depedge[edge style={red!60!}, edge below]{3}{6}{.}
+\depedge[edge style={red!60!}, edge below]{10}{11}{.}
+\depedge[edge style={red!60!}, edge below]{3}{5}{.}
+\depedge[edge style={red!60!}, edge below]{21}{22}{.}
+\depedge[edge style={red!60!}, edge below]{15}{16}{.}
+\depedge[edge style={red!60!}, edge below]{17}{18}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    The\& film\& serves\& as\& a\& valuable\& time\& capsule\& to\& remind\& us\& of\& the\& devastating\& horror\& suffered\& by\& an\& entire\& people\& . \\
+\end{deptext}
+\depedge{1}{2}{.}
+\depedge{2}{3}{.}
+\depedge{3}{8}{.}
+\depedge{4}{8}{.}
+\depedge{5}{7}{.}
+\depedge{6}{7}{.}
+\depedge{7}{8}{.}
+\depedge{8}{10}{.}
+\depedge{9}{10}{.}
+\depedge{10}{11}{.}
+\depedge{10}{12}{.}
+\depedge{12}{15}{.}
+\depedge{13}{15}{.}
+\depedge{14}{15}{.}
+\depedge{15}{16}{.}
+\depedge{16}{17}{.}
+\depedge{17}{20}{.}
+\depedge{18}{20}{.}
+\depedge{19}{20}{.}
+\depedge[edge style={red!60!}, edge below]{4}{5}{.}
+\depedge[edge style={red!60!}, edge below]{3}{4}{.}
+\depedge[edge style={red!60!}, edge below]{1}{2}{.}
+\depedge[edge style={red!60!}, edge below]{15}{16}{.}
+\depedge[edge style={red!60!}, edge below]{6}{7}{.}
+\depedge[edge style={red!60!}, edge below]{10}{12}{.}
+\depedge[edge style={red!60!}, edge below]{7}{8}{.}
+\depedge[edge style={red!60!}, edge below]{10}{11}{.}
+\depedge[edge style={red!60!}, edge below]{9}{10}{.}
+\depedge[edge style={red!60!}, edge below]{14}{15}{.}
+\depedge[edge style={red!60!}, edge below]{4}{6}{.}
+\depedge[edge style={red!60!}, edge below]{12}{13}{.}
+\depedge[edge style={red!60!}, edge below]{13}{15}{.}
+\depedge[edge style={red!60!}, edge below]{4}{9}{.}
+\depedge[edge style={red!60!}, edge below]{18}{19}{.}
+\depedge[edge style={red!60!}, edge below]{19}{20}{.}
+\depedge[edge style={red!60!}, edge below]{2}{3}{.}
+\depedge[edge style={red!60!}, edge below]{16}{17}{.}
+\depedge[edge style={red!60!}, edge below]{15}{20}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    What\& 's\& surprising\& about\& Full\& Frontal\& is\& that\& despite\& its\& overt\& self-awareness\& ,\& parts\& of\& the\& movie\& still\& manage\& to\& break\& past\& the\& artifice\& and\& thoroughly\& engage\& you\& . \\
+\end{deptext}
+\depedge{1}{3}{.}
+\depedge{2}{3}{.}
+\depedge{3}{4}{.}
+\depedge{3}{7}{.}
+\depedge{4}{6}{.}
+\depedge{5}{6}{.}
+\depedge{7}{19}{.}
+\depedge{8}{19}{.}
+\depedge{9}{12}{.}
+\depedge{9}{19}{.}
+\depedge{10}{12}{.}
+\depedge{11}{12}{.}
+\depedge{14}{15}{.}
+\depedge{14}{19}{.}
+\depedge{15}{17}{.}
+\depedge{16}{17}{.}
+\depedge{18}{19}{.}
+\depedge{19}{21}{.}
+\depedge{19}{25}{.}
+\depedge{19}{27}{.}
+\depedge{20}{21}{.}
+\depedge{21}{22}{.}
+\depedge{22}{24}{.}
+\depedge{23}{24}{.}
+\depedge{26}{27}{.}
+\depedge{27}{28}{.}
+\depedge[edge style={red!60!}, edge below]{7}{8}{.}
+\depedge[edge style={red!60!}, edge below]{15}{16}{.}
+\depedge[edge style={red!60!}, edge below]{19}{21}{.}
+\depedge[edge style={red!60!}, edge below]{19}{20}{.}
+\depedge[edge style={red!60!}, edge below]{18}{19}{.}
+\depedge[edge style={red!60!}, edge below]{14}{15}{.}
+\depedge[edge style={red!60!}, edge below]{21}{22}{.}
+\depedge[edge style={red!60!}, edge below]{2}{4}{.}
+\depedge[edge style={red!60!}, edge below]{5}{6}{.}
+\depedge[edge style={red!60!}, edge below]{14}{18}{.}
+\depedge[edge style={red!60!}, edge below]{11}{12}{.}
+\depedge[edge style={red!60!}, edge below]{8}{18}{.}
+\depedge[edge style={red!60!}, edge below]{26}{27}{.}
+\depedge[edge style={red!60!}, edge below]{9}{11}{.}
+\depedge[edge style={red!60!}, edge below]{19}{25}{.}
+\depedge[edge style={red!60!}, edge below]{4}{7}{.}
+\depedge[edge style={red!60!}, edge below]{14}{17}{.}
+\depedge[edge style={red!60!}, edge below]{1}{4}{.}
+\depedge[edge style={red!60!}, edge below]{22}{23}{.}
+\depedge[edge style={red!60!}, edge below]{19}{27}{.}
+\depedge[edge style={red!60!}, edge below]{3}{4}{.}
+\depedge[edge style={red!60!}, edge below]{27}{28}{.}
+\depedge[edge style={red!60!}, edge below]{10}{11}{.}
+\depedge[edge style={red!60!}, edge below]{22}{24}{.}
+\depedge[edge style={red!60!}, edge below]{4}{6}{.}
+\depedge[edge style={red!60!}, edge below]{9}{22}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    Whether\& you\& like\& rap\& music\& or\& loathe\& it\& ,\& you\& ca\& n't\& deny\& either\& the\& tragic\& loss\& of\& two\& young\& men\& in\& the\& prime\& of\& their\& talent\& or\& the\& power\& of\& this\& movie\& . \\
+\end{deptext}
+\depedge{1}{3}{.}
+\depedge{2}{3}{.}
+\depedge{3}{5}{.}
+\depedge{3}{6}{.}
+\depedge{3}{7}{.}
+\depedge{3}{13}{.}
+\depedge{4}{5}{.}
+\depedge{7}{8}{.}
+\depedge{10}{13}{.}
+\depedge{11}{13}{.}
+\depedge{12}{13}{.}
+\depedge{13}{17}{.}
+\depedge{14}{17}{.}
+\depedge{15}{17}{.}
+\depedge{16}{17}{.}
+\depedge{17}{18}{.}
+\depedge{17}{28}{.}
+\depedge{17}{30}{.}
+\depedge{18}{21}{.}
+\depedge{19}{21}{.}
+\depedge{20}{21}{.}
+\depedge{21}{22}{.}
+\depedge{22}{24}{.}
+\depedge{23}{24}{.}
+\depedge{24}{25}{.}
+\depedge{25}{27}{.}
+\depedge{26}{27}{.}
+\depedge{29}{30}{.}
+\depedge{30}{31}{.}
+\depedge{31}{33}{.}
+\depedge{32}{33}{.}
+\depedge[edge style={red!60!}, edge below]{30}{31}{.}
+\depedge[edge style={red!60!}, edge below]{4}{5}{.}
+\depedge[edge style={red!60!}, edge below]{17}{18}{.}
+\depedge[edge style={red!60!}, edge below]{3}{5}{.}
+\depedge[edge style={red!60!}, edge below]{2}{10}{.}
+\depedge[edge style={red!60!}, edge below]{11}{12}{.}
+\depedge[edge style={red!60!}, edge below]{32}{33}{.}
+\depedge[edge style={red!60!}, edge below]{18}{21}{.}
+\depedge[edge style={red!60!}, edge below]{20}{21}{.}
+\depedge[edge style={red!60!}, edge below]{2}{3}{.}
+\depedge[edge style={red!60!}, edge below]{16}{17}{.}
+\depedge[edge style={red!60!}, edge below]{31}{33}{.}
+\depedge[edge style={red!60!}, edge below]{15}{16}{.}
+\depedge[edge style={red!60!}, edge below]{29}{30}{.}
+\depedge[edge style={red!60!}, edge below]{3}{7}{.}
+\depedge[edge style={red!60!}, edge below]{13}{14}{.}
+\depedge[edge style={red!60!}, edge below]{10}{12}{.}
+\depedge[edge style={red!60!}, edge below]{19}{21}{.}
+\depedge[edge style={red!60!}, edge below]{21}{22}{.}
+\depedge[edge style={red!60!}, edge below]{13}{17}{.}
+\depedge[edge style={red!60!}, edge below]{1}{3}{.}
+\depedge[edge style={red!60!}, edge below]{24}{25}{.}
+\depedge[edge style={red!60!}, edge below]{13}{28}{.}
+\depedge[edge style={red!60!}, edge below]{11}{13}{.}
+\depedge[edge style={red!60!}, edge below]{28}{30}{.}
+\depedge[edge style={red!60!}, edge below]{22}{23}{.}
+\depedge[edge style={red!60!}, edge below]{5}{8}{.}
+\depedge[edge style={red!60!}, edge below]{3}{6}{.}
+\depedge[edge style={red!60!}, edge below]{24}{27}{.}
+\depedge[edge style={red!60!}, edge below]{22}{24}{.}
+\depedge[edge style={red!60!}, edge below]{23}{26}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    ...\& an\& otherwise\& intense\& ,\& twist-and-turn\& thriller\& that\& certainly\& should\& n't\& hurt\& talented\& young\& Gaghan\& 's\& resume\& . \\
+\end{deptext}
+\depedge{2}{7}{.}
+\depedge{3}{4}{.}
+\depedge{4}{7}{.}
+\depedge{6}{7}{.}
+\depedge{7}{12}{.}
+\depedge{7}{13}{.}
+\depedge{8}{12}{.}
+\depedge{9}{12}{.}
+\depedge{10}{12}{.}
+\depedge{11}{12}{.}
+\depedge{13}{17}{.}
+\depedge{14}{15}{.}
+\depedge{15}{16}{.}
+\depedge{15}{17}{.}
+\depedge[edge style={red!60!}, edge below]{2}{7}{.}
+\depedge[edge style={red!60!}, edge below]{6}{7}{.}
+\depedge[edge style={red!60!}, edge below]{13}{14}{.}
+\depedge[edge style={red!60!}, edge below]{12}{17}{.}
+\depedge[edge style={red!60!}, edge below]{7}{17}{.}
+\depedge[edge style={red!60!}, edge below]{14}{15}{.}
+\depedge[edge style={red!60!}, edge below]{10}{11}{.}
+\depedge[edge style={red!60!}, edge below]{11}{12}{.}
+\depedge[edge style={red!60!}, edge below]{14}{17}{.}
+\depedge[edge style={red!60!}, edge below]{2}{4}{.}
+\depedge[edge style={red!60!}, edge below]{9}{10}{.}
+\depedge[edge style={red!60!}, edge below]{2}{3}{.}
+\depedge[edge style={red!60!}, edge below]{8}{12}{.}
+\depedge[edge style={red!60!}, edge below]{16}{17}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    It\& provides\& the\& grand\& ,\& intelligent\& entertainment\& of\& a\& superior\& cast\& playing\& smart\& people\& amid\& a\& compelling\& plot\& . \\
+\end{deptext}
+\depedge{1}{2}{.}
+\depedge{2}{7}{.}
+\depedge{3}{7}{.}
+\depedge{4}{7}{.}
+\depedge{6}{7}{.}
+\depedge{7}{8}{.}
+\depedge{8}{11}{.}
+\depedge{9}{11}{.}
+\depedge{10}{11}{.}
+\depedge{11}{12}{.}
+\depedge{12}{14}{.}
+\depedge{12}{15}{.}
+\depedge{13}{14}{.}
+\depedge{15}{18}{.}
+\depedge{16}{18}{.}
+\depedge{17}{18}{.}
+\depedge[edge style={red!60!}, edge below]{4}{6}{.}
+\depedge[edge style={red!60!}, edge below]{9}{16}{.}
+\depedge[edge style={red!60!}, edge below]{4}{7}{.}
+\depedge[edge style={red!60!}, edge below]{2}{3}{.}
+\depedge[edge style={red!60!}, edge below]{1}{2}{.}
+\depedge[edge style={red!60!}, edge below]{2}{7}{.}
+\depedge[edge style={red!60!}, edge below]{7}{8}{.}
+\depedge[edge style={red!60!}, edge below]{11}{18}{.}
+\depedge[edge style={red!60!}, edge below]{10}{13}{.}
+\depedge[edge style={red!60!}, edge below]{6}{17}{.}
+\depedge[edge style={red!60!}, edge below]{10}{11}{.}
+\depedge[edge style={red!60!}, edge below]{7}{15}{.}
+\depedge[edge style={red!60!}, edge below]{10}{17}{.}
+\depedge[edge style={red!60!}, edge below]{8}{9}{.}
+\depedge[edge style={red!60!}, edge below]{13}{14}{.}
+\depedge[edge style={red!60!}, edge below]{12}{14}{.}
+\end{dependency}
+
+
+\begin{dependency}[hide label, edge unit distance=.5ex]
+    \begin{deptext}[column sep=0.05cm]
+    There\& 's\& ...\& tremendous\& energy\& from\& the\& cast\& ,\& a\& sense\& of\& playfulness\& and\& excitement\& that\& seems\& appropriate\& . \\
+\end{deptext}
+\depedge{1}{2}{.}
+\depedge{2}{5}{.}
+\depedge{4}{5}{.}
+\depedge{5}{6}{.}
+\depedge{5}{11}{.}
+\depedge{5}{17}{.}
+\depedge{6}{8}{.}
+\depedge{7}{8}{.}
+\depedge{10}{11}{.}
+\depedge{11}{12}{.}
+\depedge{12}{13}{.}
+\depedge{13}{14}{.}
+\depedge{13}{15}{.}
+\depedge{16}{17}{.}
+\depedge{17}{18}{.}
+\depedge[edge style={red!60!}, edge below]{13}{15}{.}
+\depedge[edge style={red!60!}, edge below]{11}{12}{.}
+\depedge[edge style={red!60!}, edge below]{10}{11}{.}
+\depedge[edge style={red!60!}, edge below]{1}{2}{.}
+\depedge[edge style={red!60!}, edge below]{17}{18}{.}
+\depedge[edge style={red!60!}, edge below]{4}{5}{.}
+\depedge[edge style={red!60!}, edge below]{16}{17}{.}
+\depedge[edge style={red!60!}, edge below]{11}{13}{.}
+\depedge[edge style={red!60!}, edge below]{5}{11}{.}
+\depedge[edge style={red!60!}, edge below]{5}{6}{.}
+\depedge[edge style={red!60!}, edge below]{1}{10}{.}
+\depedge[edge style={red!60!}, edge below]{11}{16}{.}
+\depedge[edge style={red!60!}, edge below]{12}{14}{.}
+\depedge[edge style={red!60!}, edge below]{7}{8}{.}
+\depedge[edge style={red!60!}, edge below]{6}{8}{.}
+\end{dependency}
