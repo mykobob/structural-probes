@@ -138,18 +138,19 @@ def run_report_results(args, probe, dataset, model, loss, reporter, regimen):
   probe.load_state_dict(torch.load(probe_params_path))
   probe.eval()
 
+  import pdb; pdb.set_trace()
   dev_dataloader = dataset.get_dev_dataloader()
   dev_predictions = regimen.predict(probe, model, dev_dataloader)
   reporter(dev_predictions, dev_dataloader, 'dev')
 
-  #train_dataloader = dataset.get_train_dataloader(shuffle=False)
-  #train_predictions = regimen.predict(probe, model, train_dataloader)
-  #reporter(train_predictions, train_dataloader, 'train')
+  train_dataloader = dataset.get_train_dataloader(shuffle=False)
+  train_predictions = regimen.predict(probe, model, train_dataloader)
+  reporter(train_predictions, train_dataloader, 'train')
 
   # Uncomment to run on the test set
-  #test_dataloader = dataset.get_test_dataloader()
-  #test_predictions = regimen.predict(probe, model, test_dataloader)
-  #reporter(test_predictions, test_dataloader, 'test')
+  test_dataloader = dataset.get_test_dataloader()
+  test_predictions = regimen.predict(probe, model, test_dataloader)
+  reporter(test_predictions, test_dataloader, 'test')
 
 def execute_experiment(args, train_probe, report_results):
   """

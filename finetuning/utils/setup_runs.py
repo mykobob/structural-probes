@@ -20,8 +20,8 @@ def get_default_args(desired_hparams, desired_params):
     }
 
     params = {
-        'sst_train_path': os.path.join("..", "..", "..", "..", "data", "SST-2", "sentence_splits", "train_cat.tsv"),
-        'sst_val_path': os.path.join("..", "..", "..", "..", "data", "SST-2", "sentence_splits", "dev_cat.tsv"),
+        'sst_train_path': os.path.join("..", "..", "..", "data", "SST-2", "sentence_splits", "train_cat.tsv"),
+        'sst_val_path': os.path.join("..", "..", "..", "data", "SST-2", "sentence_splits", "dev_cat.tsv"),
         'disable_cuda': False,
         'run_name': 'default',
         'debug': False,

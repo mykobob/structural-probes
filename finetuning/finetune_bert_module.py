@@ -15,106 +15,82 @@ from loaders import SST
 
 
 sigmoid = nn.Sigmoid()
+softmax = nn.Softmax(dim=1)
 def determine_correctness(pred, label):
     """Takes in pred and label (both tensors) and returns average correctness (float)"""
     with torch.no_grad():
-        return torch.mean((label - pred) ** 2)
+        probs = softmax(pred)
+        class_preds = torch.argmax(probs, dim=1)
+        return (class_preds == label).float().mean()
+#         return torch.mean((label - pred) ** 2)
 
 
 class SST_Test(pl.LightningModule):
-    def __init__(self, args, hparams):
+    def __init__(self, hparams, params):
         super().__init__()
-        self.args = args
+        self.loss = nn.CrossEntropyLoss(reduction='mean')
+        self.regression = 'MSELoss' in str(type(self.loss))
+        self.args = params
         self.log = self._config_logger()
         self.hparams = hparams
 
         tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
-        self.train_dataset = SST(args, hparams, args.sst_train_path, tokenizer)
-        self.val_dataset =   SST(args, hparams, args.sst_val_path, tokenizer)
+        self.train_dataset = SST(params, hparams, params.sst_train_path, tokenizer)
+        self.val_dataset =   SST(params, hparams, params.sst_val_path, tokenizer)
 
-        self.bert = self.create_model(args.device)
+        self.bert = self.create_model()
         self.training_acc = []
         self.val_acc = []
 
-        #self.loss = nn.MSELoss()
-        self.loss = nn.CrossEntropyLoss()
-        self.do_sigmoid = 'MSELoss' in str(type(self.loss))
+        #self.loss = nn.MSELoss(reduction='mean')
 
 
-    def create_model(self, device):
+    def create_model(self):
         config = BertConfig.from_pretrained('bert-base-cased')
         config.output_hidden_states=True
-        config.num_labels = 1
-        bert = BertForSequenceClassification.from_pretrained('bert-base-cased', config=config).to(device)
-        #bert = self.freeze_bert(bert)
+        config.num_labels = 1 if self.regression else 2
+        bert = BertForSequenceClassification.from_pretrained('bert-base-cased', config=config)
 
         return bert
 
-    def freeze_bert(self, bert):
-        unfreeze_layers = '11'.split()
-        # Freeze layers of bert
-        for name, param in bert.named_parameters():
-            for layer in unfreeze_layers:
-                if layer in name:
-                    param.requires_grad = True
-        to_unfreeze = '11'.split()
-        # Freeze layers of bert
-        for name, param in bert.named_parameters():
-            for layer_num in to_unfreeze:
-                if layer_num in name:
-                    print(f"{name} is unfrozen")
-                    param.requires_grad = True
-
-            if not "classifier" in name:
-                param.requires_grad = False
-            else:
-                print(f"{name} is unfrozen")
-                param.requires_grad = True
-        return bert
-
-    def forward(self, x, attn_mask):
-        bert_out, encoded_layers = self.bert(x, attention_mask=attn_mask)
-
-        #output = bert_out[0].squeeze(1)
-        if self.do_sigmoid:
-            output = sigmoid(bert_out)
+    def forward(self, x, attn_mask, label=None):
+        if label is None:
+            logits, encoded_layers = self.bert(x, attention_mask=attn_mask)
         else:
-            output = bert_out
+            loss, logits, encoded_layers = self.bert(x, attention_mask=attn_mask, labels = label)
+
+        if self.regression:
+            output = sigmoid(logits)
+        else:
+            output = logits
         
-#         import pdb; pdb.set_trace()
-        return output
+        if label is None:
+            return output, encoded_layers
+        else:
+            return loss, output, encoded_layers
 
     def training_step(self, batch, batch_nb):
         sent_tensor = batch['sentence_tensor']
         attn_mask = batch['attn_mask']
         label = batch['label']
 
-        pred = self.forward(sent_tensor, attn_mask)
+        loss, pred, _ = self.forward(sent_tensor, attn_mask, label)
 
         correct = determine_correctness(pred, label)
         self.training_acc.append(correct.clone().detach().float())
-        if self.do_sigmoid:
-            loss = self.loss(pred, label, reduction='mean')  # , pos_weight=self.pos_weight)
-        else:
-            loss = self.loss(pred, label)
-        #loss = torch.exp(log_loss)
+#         loss = self.loss(pred, label)
 
         try:
-            # If there is a scheduler set up, log the learning rate, otherwise skip it.
             tensorboard_logs = {'train_loss': loss, 'lr': torch.tensor(self.sched.get_lr()).squeeze()}
         except AttributeError:
             tensorboard_logs = {'train_loss': loss}
-#         import pdb; pdb.set_trace()
-#         self.logger.log_metrics(tensorboard_logs, step=self.global_step)
-
+            
         return {'loss': loss, 'log': tensorboard_logs}
 
     def on_epoch_end(self):
         training_acc_tensor = torch.stack(self.training_acc)
         avg_loss = {"loss": training_acc_tensor.mean()}
-#         self.logger.log_metrics(avg_mse, step=self.global_step)
 
-        # clear training_acc
         self.training_acc = []
         return avg_loss
 
@@ -123,12 +99,9 @@ class SST_Test(pl.LightningModule):
         attn_mask = batch['attn_mask']
         label = batch['label']
 
-        pred = self.forward(sent_tensor, attn_mask)
-
-        if self.do_sigmoid:
-            loss = self.loss(pred, label, reduction='mean')
-        else:
-            loss = self.loss(pred, label)
+        loss, pred, _ = self.forward(sent_tensor, attn_mask, label)
+        
+#         loss = self.loss(pred, label)
 
         return {'val_loss': loss.clone().detach(),
                 'predicted': pred.detach()}
@@ -143,12 +116,7 @@ class SST_Test(pl.LightningModule):
             'val_loss': avg_loss,
             'mean_pred': predictions.mean(), 'std_pred': predictions.std()
         }
-
-#         if self.current_epoch != 0:
-            # We don't want the "sanity check" validation run to be logged
-#             self.logger.log_metrics(tensorboard_logs, step=self.global_step)
-
-        print("Val loss: {:.3f}".format(avg_loss))
+        
         return {'val_loss': avg_loss, 'log': tensorboard_logs}
 
     def test_step(self, batch, batch_nb):
@@ -162,6 +130,19 @@ class SST_Test(pl.LightningModule):
         print(f"Test loss: {test_loss}\n")
         del end_dict['val_loss']
         return end_dict
+    
+    def test_epoch_end(self, outputs):
+        # Combine validation results
+        avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
+
+        predictions = torch.stack([x['predicted'] for x in outputs])
+
+        tensorboard_logs = {
+            'test_loss': avg_loss,
+            'mean_pred': predictions.mean(), 'std_pred': predictions.std()
+        }
+        
+        return {'test_loss': avg_loss, 'log': tensorboard_logs}
 
     def configure_optimizers(self):
         optim = torch.optim.Adam(self.parameters(), lr=self.hparams.lr)
@@ -183,6 +164,11 @@ class SST_Test(pl.LightningModule):
 
     @pl.data_loader
     def val_dataloader(self):
+        self.log.info(f"Validation dataset has {len(self.val_dataset)} examples")
+        return DataLoader(self.val_dataset, 1, shuffle=False, num_workers=4)
+    
+    @pl.data_loader
+    def test_dataloader(self):
         self.log.info(f"Validation dataset has {len(self.val_dataset)} examples")
         return DataLoader(self.val_dataset, 1, shuffle=False, num_workers=4)
 

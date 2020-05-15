@@ -49,11 +49,12 @@ def prepare_sentence_for_bert(line, tokenizer, max_seq_len=64):
     tokenized_sent = tokenizer.wordpiece_tokenizer.tokenize('[CLS] ' + ' '.join(untokenized_sent) + ' [SEP]')
     if len(tokenized_sent) > max_seq_len:
         tokenized_sent = tokenized_sent[:max_seq_len - 1] + ['[SEP]']
+    num_proper_words = len(tokenized_sent)
     tokenized_sent = tokenized_sent + ['[PAD]'] * (max_seq_len - len(tokenized_sent))
     untok_tok_mapping = data.SubwordDataset.match_tokenized_to_untokenized(tokenized_sent, untokenized_sent)
 
     indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_sent)
-    segment_ids = [1 for x in tokenized_sent]
+    segment_ids = [1 if idx < num_proper_words else 0 for idx, x in enumerate(tokenized_sent)] 
 
     tokens_tensor = torch.tensor(indexed_tokens)
     segments_tensors = torch.tensor(segment_ids)

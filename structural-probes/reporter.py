@@ -97,17 +97,28 @@ class WordPairReporter(Reporter):
       split_name the string naming the data split: {train,dev,test}
     """
     lengths_to_spearmanrs = defaultdict(list)
-    for prediction_batch, (data_batch, label_batch, length_batch, observation_batch) in zip(
-        prediction_batches, dataset):
-      for prediction, label, length, (observation, _) in zip(
-          prediction_batch, label_batch,
-          length_batch, observation_batch):
-        words = observation.sentence
-        length = int(length)
-        prediction = prediction[:length,:length]
-        label = label[:length,:length].cpu()
-        spearmanrs = [spearmanr(pred, gold) for pred, gold in zip(prediction, label)]
-        lengths_to_spearmanrs[length].extend([x.correlation for x in spearmanrs])
+
+    print('SPEARMANR' * 20)
+    # Print out the additional spearmanr average of the batch
+    with open(os.path.join(self.reporting_root, split_name + '.spearmanr_batch_average'), 'w') as fout:
+      for prediction_batch, (data_batch, label_batch, length_batch, observation_batch) in zip(
+          prediction_batches, dataset):
+
+        batch_corrleations = []
+        for prediction, label, length, (observation, _) in zip(
+            prediction_batch, label_batch,
+            length_batch, observation_batch):
+          words = observation.sentence
+          length = int(length)
+          prediction = prediction[:length,:length]
+          label = label[:length,:length].cpu()
+          spearmanrs = [spearmanr(pred, gold) for pred, gold in zip(prediction, label)]
+          correlations = [x.correlation for x in spearmanrs]
+          batch_corrleations += correlations
+          lengths_to_spearmanrs[length].extend(correlations)
+        fout.write(str(np.mean(np.array(batch_corrleations))) + '\n')   
+        #Output spearmanr batch spearmanr average
+
     mean_spearman_for_each_length = {length: np.mean(lengths_to_spearmanrs[length]) 
         for length in lengths_to_spearmanrs}
 
@@ -184,31 +195,43 @@ class WordPairReporter(Reporter):
     uspan_total = 0
     uspan_correct = 0
     total_sents = 0
-    for prediction_batch, (data_batch, label_batch, length_batch, observation_batch) in tqdm(zip(
-        prediction_batches, dataset), desc='[uuas,tikz]'):
-      for prediction, label, length, (observation, _) in zip(
-          prediction_batch, label_batch,
-          length_batch, observation_batch):
-        words = observation.sentence
-        poses = observation.xpos_sentence
-        length = int(length)
-        assert length == len(observation.sentence)
-        prediction = prediction[:length,:length]
-        label = label[:length,:length].cpu()
-
-        gold_edges = prims_matrix_to_edges(label, words, poses)
-        pred_edges = prims_matrix_to_edges(prediction, words, poses)
-
-        if split_name != 'test' and total_sents < 20:
-          self.print_tikz(pred_edges, gold_edges, words, split_name)
-
-        uspan_correct += len(set([tuple(sorted(x)) for x in gold_edges]).intersection(
-          set([tuple(sorted(x)) for x in pred_edges])))
-        uspan_total += len(gold_edges)
-        total_sents += 1
-    uuas = uspan_correct / float(uspan_total)
     with open(os.path.join(self.reporting_root, split_name + '.uuas'), 'w') as fout:
-      fout.write(str(uuas) + '\n')
+      for prediction_batch, (data_batch, label_batch, length_batch, observation_batch) in tqdm(zip(
+          prediction_batches, dataset), desc='[uuas,tikz]'):
+        
+        uspan_batch_correct = 0
+        uspan_batch_total = 0
+
+        for prediction, label, length, (observation, _) in zip(
+            prediction_batch, label_batch,
+            length_batch, observation_batch):
+          words = observation.sentence
+          poses = observation.xpos_sentence
+          length = int(length)
+          assert length == len(observation.sentence)
+          prediction = prediction[:length,:length]
+          label = label[:length,:length].cpu()
+
+          gold_edges = prims_matrix_to_edges(label, words, poses)
+          pred_edges = prims_matrix_to_edges(prediction, words, poses)
+
+          # Only report the first 20 tikz
+          if split_name != 'test' and total_sents < 20:
+            self.print_tikz(pred_edges, gold_edges, words, split_name)
+
+          uspan_batch_correct += len(set([tuple(sorted(x)) for x in gold_edges]).intersection(
+            set([tuple(sorted(x)) for x in pred_edges])))
+          uspan_batch_total += len(gold_edges)
+          total_sents += 1
+        
+        # Output uuas of every batch
+        fout.write(str(uspan_batch_correct/float(uspan_batch_total)) + '\n')
+        uspan_correct += uspan_batch_correct
+        uspan_total += uspan_batch_total
+
+      uuas = uspan_correct / float(uspan_total)
+      fout.write('total uuas:' + str(uuas) + '\n')    # Output the overall averages
+
 
   def print_tikz(self, prediction_edges, gold_edges, words, split_name):
     ''' Turns edge sets on word (nodes) into tikz dependency LaTeX. '''

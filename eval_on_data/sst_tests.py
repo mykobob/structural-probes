@@ -4,8 +4,16 @@
 # In[1]:
 
 
+#get_ipython().run_line_magic('cd', '..')
+
+
+# In[2]:
+
+
+import os
 import sys
 sys.path.append('structural-probes')
+sys.path.append('finetuning')
 from pathlib import Path
 
 from run_experiment import setup_new_experiment_dir, execute_experiment
@@ -14,15 +22,18 @@ import torch
 import pandas as pd
 import eval_probes_on_dataset
 import jupyter_slack
+from utils import setup_runs
+import finetune_bert_module
+
 from transformers import BertConfig, BertTokenizer, BertForSequenceClassification
 from sklearn.metrics import f1_score
 
 
-# In[2]:
+# In[3]:
 
 
 def setup_args_and_folder(): 
-    CONFIG_FILE = 'example/config/bert_base_distance_ptb3.yaml'
+    CONFIG_FILE = 'configs/bert_base_distance_ptb3.yaml'
     EXPERIMENT_NAME = ''
     SEED = 123
 
@@ -41,7 +52,7 @@ def setup_args_and_folder():
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     yaml_args['device'] = device
-    yaml_args['model_type'] = 'base'
+    yaml_args['model_type'] = 'large'
     return yaml_args
 
 yaml_args = setup_args_and_folder()
@@ -67,7 +78,7 @@ yaml_args = setup_args_and_folder()
 # - Run the ReadSentimentDataset `java -mx4g edu.stanford.nlp.sentiment.ReadSentimentDataset -inputDir data/SST-2/original -outputDir tmp/`
 #   - The ground truth already does subword partitions, so need to account for that
 
-# In[3]:
+# In[4]:
 
 
 from nltk.tree import Tree
@@ -77,7 +88,7 @@ from tqdm import tqdm
 import copy
 
 
-# In[4]:
+# In[5]:
 
 
 def read_trees(path):
@@ -99,10 +110,10 @@ def read_sentiment_sentences(path):
         return sentences, labels
 
 
-# In[5]:
+# In[6]:
 
 
-data_base = Path('../../../data/SST-2')
+data_base = Path('data/SST-2')
 
 train_path = data_base / 'sentence_splits' / 'train_cat.tsv'
 dev_path = data_base / 'sentence_splits' / 'dev_cat.tsv'
@@ -120,7 +131,30 @@ gt_train_trees = read_trees(gt_tree_train_path)
 gt_dev_trees = read_trees(gt_tree_dev_path)
 
 
-# In[6]:
+# In[7]:
+
+
+from finetune_bert_module import SST_Test
+
+desired_params = {
+    'sst_train_path': os.path.join("data", "SST-2", "sentence_splits", "train_cat.tsv"),
+    'sst_val_path': os.path.join("data", "SST-2", "sentence_splits", "dev_cat.tsv"),
+}
+hparams, params = setup_runs.get_default_args({}, desired_params)
+
+config = BertConfig.from_pretrained('bert-base-cased')
+config.output_hidden_states=True
+config.num_labels = 1
+model = finetune_bert_module.SST_Test.load_from_checkpoint(
+        'finetuning/lightning_logs/proper_classification/_ckpt_epoch_0.ckpt', None, None, params)
+# model = BertForSequenceClassification.from_pretrained('bert-large-cased', config=config)
+model = model.to(yaml_args['device'])
+model.eval()
+
+tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
+
+
+# In[9]:
 
 
 # Calculate distance between the two trees
@@ -129,122 +163,223 @@ gt_dev_trees = read_trees(gt_tree_dev_path)
 # import importlib
 # importlib.reload(eval_probes_on_dataset)
 
-if yaml_args['model_type'] == 'large':
-    tokenizer = BertTokenizer.from_pretrained('bert-large-cased')
-    config = BertConfig.from_pretrained('bert-large-cased')
-    config.output_hidden_states=True
-    config.num_labels = 1
-    model = BertForSequenceClassification.from_pretrained('best_models/bert_base', config=config)
-    LAYER_COUNT = 24
-    FEATURE_COUNT = 1024
-else:
-    tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
-    config = BertConfig.from_pretrained('bert-base-cased')
-    config.output_hidden_states=True
-    config.num_labels = 1
-    model = BertForSequenceClassification.from_pretrained('best_models/bert_base', config=config)
-    LAYER_COUNT = 12
-    FEATURE_COUNT = 768
-model.to(yaml_args['device'])
-model.eval()
-
 word_dists, word_depths, predicted_edges = eval_probes_on_dataset.use_probes(yaml_args, dev_sentiment, model, tokenizer)
 
 
-# In[7]:
+# In[18]:
 
 
-sigmoid = torch.nn.Sigmoid()
-mse = 0
-guessing_0 = 0
-guessing_1 = 0
+# Calculate accuracy of the model
+softmax = torch.nn.Softmax(dim=1)
 preds = []
-labels = []
+labels = [] 
 for idx, line in tqdm(enumerate(dev_sentiment), desc='Eval Dev Sentiment'):
     _, tokens_tensor, segments_tensors = eval_probes_on_dataset.prepare_sentence_for_bert(line, tokenizer)
     line_label = int(dev_labels[idx])
-    guessing_0 += line_label ** 2
-    guessing_1 += (1 - line_label) ** 2
 
     device = yaml_args['device']
     tokens_tensor = tokens_tensor.unsqueeze(0).to(device)
     segments_tensors = segments_tensors.unsqueeze(0).to(device)
     with torch.no_grad():
         logits, encoded_layers = model(tokens_tensor, segments_tensors)
-        probs = sigmoid(logits)
-        mse += (line_label - probs.item()) ** 2
-        preds.append(probs.item())
-    labels.append(line_label)
+        probs = softmax(logits)
+        preds.append(0 if probs[0][0] >= probs[0][1] else 1)
+    labels.append(line_label)        
 
-print('Higher is bad', mse / len(dev_sentiment))
-print('All 0', guessing_0 / len(dev_sentiment))
-print('All 1', guessing_1 / len(dev_sentiment))
+
+# In[19]:
+
+
 print('f1', f1_score(labels, preds))
 
 
+# # Loading in test sets
 
-# In[8]:
-
-
-def earliest_root(a, b):
-    for i in range(min(len(a), len(b))):
-        if a[i] != b[i]:
-            return i
-    return -1
-
-def get_adj_matrix(cur_tree):
-    num_words = len(cur_tree.leaves())
-    all_paths = [cur_tree.leaf_treeposition(i) for i in range(num_words)]
-    matrix = [[0] * num_words for _ in range(num_words)]
-
-    for a_idx, a in enumerate(all_paths):
-        for b_idx, b in enumerate(all_paths):
-            if a_idx < b_idx:
-                root = earliest_root(a, b)
-                matrix[a_idx][b_idx] = len(a) + len(b) - 2 * root
-                matrix[b_idx][a_idx] = len(a) + len(b) - 2 * root
-    return matrix
+# In[26]:
 
 
-# In[9]:
+import pandas as pd
+
+# Load the dataset into a pandas dataframe.
+# temp_root_path = "/home/garysnake/Desktop/structural-probes/experiments/data/cola_public"
+temp_data_path = "data/SST-2/sentence_splits/dev_cat.tsv"
+df = pd.read_csv(temp_data_path, delimiter='\t', header=None, names=['sentence', 'label'])
+
+# Report the number of sentences.
+print('Number of test sentences: {:,}\n'.format(df.shape[0]))
+
+# Create sentence and label lists
+sentences = df.sentence.values
+labels = df.label.values
+
+# Tokenize all of the sentences and map the tokens to thier word IDs.
+input_ids = []
+attention_masks = []
+
+# For every sentence...
+for sent in sentences:
+    # `encode_plus` will:
+    #   (1) Tokenize the sentence.
+    #   (2) Prepend the `[CLS]` token to the start.
+    #   (3) Append the `[SEP]` token to the end.
+    #   (4) Map tokens to their IDs.
+    #   (5) Pad or truncate the sentence to `max_length`
+    #   (6) Create attention masks for [PAD] tokens.
+    encoded_dict = tokenizer.encode_plus(
+                        sent,                      # Sentence to encode.
+                        add_special_tokens = True, # Add '[CLS]' and '[SEP]'
+                        max_length = 64,           # Pad & truncate all sentences.
+                        pad_to_max_length = True,
+                        return_attention_mask = True,   # Construct attn. masks.
+                        return_tensors = 'pt',     # Return pytorch tensors.
+                   )
+    
+    # Add the encoded sentence to the list.    
+    input_ids.append(encoded_dict['input_ids'])
+    
+    # And its attention mask (simply differentiates padding from non-padding).
+    attention_masks.append(encoded_dict['attention_mask'])
+
+# Convert the lists into tensors.
+input_ids = torch.cat(input_ids, dim=0)
+attention_masks = torch.cat(attention_masks, dim=0)
+labels = torch.tensor(labels)
+
+# Set the batch size.  
+batch_size = 32  
+
+from torch.utils.data import TensorDataset, SequentialSampler, DataLoader
+# Create the DataLoader.
+prediction_data = TensorDataset(input_ids, attention_masks, labels)
+prediction_sampler = SequentialSampler(prediction_data)
+prediction_dataloader = DataLoader(prediction_data, sampler=prediction_sampler, batch_size=batch_size)
 
 
-def report_uuas(predicted_edges, trees, split_name):
-    uspan_total = 0
-    uspan_correct = 0
-    total_sents = 0
-    for predicted_edge, gt_tree in tqdm(zip(predicted_edges, trees), desc='[uuas,tikz]'):
-        words = gt_tree.leaves()
-        poses = gt_tree.leaves()
-        gold_edges = get_adj_matrix(gt_tree)
-        gold_edges = prims_matrix_to_edges(gold_edges, words, poses)
-        pred_edges = predicted_edge
-
-        gold_span = set([tuple(sorted(x)) for x in gold_edges])
-        pred_span = set([tuple(sorted(x)) for x in pred_edges])
-        uspan_correct += len(gold_span.intersection(pred_span))
-        uspan_total += len(gold_edges)
-        total_sents += 1
-
-    uuas = uspan_correct / float(uspan_total)
-    return uuas
-
-uuas_score = report_uuas(predicted_edges, gt_dev_trees, 'dev')
-print(uuas_score)
+# In[38]:
 
 
-# In[10]:
+import numpy as np
+# Function to calculate the accuracy of our predictions vs labels
+def flat_accuracy(preds, labels):
+    pred_flat = np.argmax(preds, axis=1).flatten()
+    labels_flat = labels.flatten()
+    return np.sum(pred_flat == labels_flat) / len(labels_flat)
 
 
-def get_sentiments():
-    pass    
+# In[39]:
+
+
+from sklearn.metrics import matthews_corrcoef
+
+# Prediction on test set
+
+
+print('Predicting labels for {:,} test sentences...'.format(len(input_ids)))
+
+# Tracking variables 
+# predictions , true_labels = [], []
+batch_accuracy = []
+mcc = []
+
+# Predict 
+for batch in prediction_dataloader:
+    # Add batch to GPU
+    batch = tuple(t.to(device) for t in batch)
+
+    # Unpack the inputs from our dataloader
+    b_input_ids, b_input_mask, b_labels = batch
+
+    # Telling the model not to compute or store gradients, saving memory and 
+    # speeding up prediction
+    with torch.no_grad():
+        # Forward pass, calculate logit predictions
+        logits, encoded_layers = model.forward(b_input_ids, attn_mask=b_input_mask)
+
+    # Move logits and labels to CPU
+    logits = logits.detach().cpu().numpy()
+    label_ids = b_labels.to('cpu').numpy()
+    
+    # Record batch accuracy
+    batch_accuracy.append(flat_accuracy(logits, label_ids))
+
+    # Record batch mcc  
+    mcc.append(matthews_corrcoef(label_ids, np.argmax(logits, axis=1).flatten()))
+      
+    # Store predictions and true labels
+#     predictions.append(logits)
+#     true_labels.append(label_ids)
+
+print('    DONE.')
+
+
+# # Plotting Scatter plots of UUAS v Accuracy & Spearmanr vs Accuracy
+
+# In[40]:
+
+
+import matplotlib.pyplot as plt 
+#  matplotlib inline
+
+import seaborn as sns
+
+def plot_scatter(x, y, x_name, y_name):
+    # Use plot styling from seaborn.
+    sns.set(style='darkgrid')
+
+    # Increase the plot size and font size.
+    sns.set(font_scale=1.5)
+    plt.rcParams["figure.figsize"] = (12,6)
+
+    # Plot the learning curve.
+    plt.scatter(x, y)
+
+    # Label the plot.
+    plt.title("{:} & {:}".format(x_name, y_name))
+    plt.xlabel(x_name)
+    plt.ylabel(y_name)
+
+    plt.show()
+
+
+#  Next step export this set, and run probe on this dev
+# Next step might be running 
+print(len(batch_accuracy))
+
+batch_uuas = []
+with open('probe_scores/dev.uuas','r') as f:
+    for line in f.readlines():
+        try:
+            batch_uuas.append(float(line))
+        except ValueError:
+            pass
+
+
+batch_spearman = []
+with open('probe_scores/dev.spearmanr_batch_average','r') as f:
+    for line in f.readlines():
+        try:
+            batch_spearman.append(float(line))
+        except ValueError:
+            pass
+    
+
+plot_scatter(batch_accuracy, batch_uuas, "accuracy", "uuas")
+
+plot_scatter(batch_accuracy, batch_spearman, "accuracy", "spearman")
+
+plot_scatter(mcc, batch_uuas, "mcc", "uuas")
+
+plot_scatter(mcc, batch_spearman, "mcc", "spearman")
+
+
+
+        
+
+    
 
 
 # In[ ]:
 
 
-#get_ipython().run_cell_magic(u'notify', u'"result"', u'result = f"Finished SST: {uuas_score:.4f}"\nprint(result)')
 
-
-# In[ ]:
 
