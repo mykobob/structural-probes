@@ -25,7 +25,7 @@
 #        #cat /home/mli/nltk_data/corpora/treebank/combined/wsj_0$i.mrg
 #        #cat /home/mli/School/data_mining/CS391D_Final_Project/code/lib/data/penn-treebank/ptb.train.txt
 #done > sst-train.trees
-cat /work/06129/mbli/maverick2/CS391D_Final_Project/data/SST-2/tree_format/train.txt > sst-train.trees
+cat /home/mli/School/data_mining/CS391D_Final_Project/data/SST-2/trees/train.txt > sst-train.trees
 
 # Dev sections
 #for i in `seq -f "%03g" 182 190`; do
@@ -33,7 +33,7 @@ cat /work/06129/mbli/maverick2/CS391D_Final_Project/data/SST-2/tree_format/train
 #        #cat /home/mli/nltk_data/corpora/treebank/combined/wsj_0$i.mrg
 #        #cat /home/mli/School/data_mining/CS391D_Final_Project/code/lib/data/penn-treebank/ptb.valid.txt
 #done > sst-dev.trees
-cat /work/06129/mbli/maverick2/CS391D_Final_Project/data/SST-2/tree_format/dev.txt > sst-dev.trees
+cat /home/mli/School/data_mining/CS391D_Final_Project/data/SST-2/trees/dev.txt > sst-dev.trees
 
 # Test sections
 #for i in `seq -f "%03g" 191 199`; do
@@ -41,10 +41,10 @@ cat /work/06129/mbli/maverick2/CS391D_Final_Project/data/SST-2/tree_format/dev.t
 #        #cat /home/mli/nltk_data/corpora/treebank/combined/wsj_0$i.mrg
 #        #cat /home/mli/School/data_mining/CS391D_Final_Project/code/lib/data/penn-treebank/ptb.test.txt
 #done > sst-test.trees
-cat /work/06129/mbli/maverick2/CS391D_Final_Project/data/SST-2/tree_format/test> sst-test.trees
+cat /home/mli/School/data_mining/CS391D_Final_Project/data/SST-2/trees/test.txt > sst-test.trees
 
-for split in train dev test; do
+#for split in train dev test; do
+for split in dev; do
     echo Converting $split split...
-    java -mx1g edu.stanford.nlp.trees.EnglishGrammaticalStructure -treeFile sst-${split}.trees -checkConnected -basic -keepPunct -conllx > results/sst-${split}.conllx
+    java -mx1g edu.stanford.nlp.trees.EnglishGrammaticalStructure -treeFile sst-${split}.trees -checkConnected -basic -keepPunct -conllx > sst-${split}.conllx
 done
-

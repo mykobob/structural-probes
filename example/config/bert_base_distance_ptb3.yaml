@@ -34,8 +34,8 @@ probe:
   maximum_rank: 768
   psd_parameters: True
   diagonal: False
-  depth_params_path:    example/data/bertbase16-depth-probe.params
-  distance_params_path: example/data/bertbase16-distance-probe.params
+  depth_params_path:    probe_models/bertbase16-depth-probe.params
+  distance_params_path: probe_models/bertbase16-distance-probe.params
   params_path: bertbase16-distance-probe.params
 probe_training:
   epochs: 30
